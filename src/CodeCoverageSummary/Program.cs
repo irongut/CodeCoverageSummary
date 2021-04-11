@@ -9,24 +9,40 @@ namespace CodeCoverageSummary
 {
     internal static class Program
     {
-        //private const string _filename = "D:\\Dev\\Csharp\\CodeCoverageSummary\\coverage.cobertura.xml";
+        // test file: /Dev/Csharp/CodeCoverageSummary/coverage.cobertura.xml
 
         private static int Main(string[] args)
         {
             return Parser.Default.ParseArguments<CommandLineOptions>(args)
-                                       .MapResult<CommandLineOptions, int>(o =>
+                                       .MapResult(o =>
                                        {
                                            try
                                            {
-                                               Console.WriteLine($"Parsing Code Coverage File: {o.Filename}{Environment.NewLine}");
-                                               string summary = ParseTestResults(o.Filename);
-                                               if (string.IsNullOrWhiteSpace(summary))
+                                               Console.WriteLine($"Code Coverage File: {o.Filename}");
+                                               CodeSummary summary = ParseTestResults(o.Filename);
+                                               if (summary == null)
                                                {
                                                    return -2; // error
                                                }
                                                else
                                                {
-                                                   Console.WriteLine(summary);
+                                                   StringBuilder summaryText = new();
+                                                   if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
+                                                   {
+                                                       summaryText.AppendLine($"Line Rate = {summary.LineRate * 100:N0}%, Lines Covered = {summary.LinesCovered} / {summary.LinesValid}")
+                                                                  .AppendLine($"Branch Rate = {summary.BranchRate * 100:N0}%, Branches Covered = {summary.BranchesCovered} / {summary.BranchesValid}");
+                                                       foreach (CodeCoverage package in summary.Packages)
+                                                       {
+                                                           summaryText.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity}");
+                                                       }
+                                                   }
+                                                   else
+                                                   {
+                                                       Console.WriteLine("Error: Unknown output format.");
+                                                       return -2; // error
+                                                   }
+
+                                                   Console.WriteLine(summaryText.ToString());
                                                    return 0; // success
                                                }
                                            }
@@ -38,9 +54,9 @@ namespace CodeCoverageSummary
                                        errs => -1); // invalid arguments
         }
 
-        private static string ParseTestResults(string filename)
+        private static CodeSummary ParseTestResults(string filename)
         {
-            StringBuilder summaryText = new StringBuilder();
+            CodeSummary summary = new();
             try
             {
                 string rss = File.ReadAllText(filename);
@@ -53,32 +69,32 @@ namespace CodeCoverageSummary
                 var lineR = from item in coverage.Attributes()
                             where item.Name == "line-rate"
                             select item;
-                double lineRate = double.Parse(lineR.First().Value);
+                summary.LineRate = double.Parse(lineR.First().Value);
 
                 var linesCovered = from item in coverage.Attributes()
                                    where item.Name == "lines-covered"
                                    select item;
+                summary.LinesCovered = int.Parse(linesCovered.First().Value);
 
                 var linesValid = from item in coverage.Attributes()
                                  where item.Name == "lines-valid"
                                  select item;
+                summary.LinesValid = int.Parse(linesValid.First().Value);
 
                 var branchR = from item in coverage.Attributes()
                               where item.Name == "branch-rate"
                               select item;
-                double branchRate = double.Parse(branchR.First().Value);
+                summary.BranchRate = double.Parse(branchR.First().Value);
 
                 var branchesCovered = from item in coverage.Attributes()
                                       where item.Name == "branches-covered"
                                       select item;
+                summary.BranchesCovered = int.Parse(branchesCovered.First().Value);
 
                 var branchesValid = from item in coverage.Attributes()
                                     where item.Name == "branches-valid"
                                     select item;
-
-                summaryText.AppendLine("Code Coverage Results:")
-                           .AppendLine($"Line Rate = {lineRate * 100:N0}%, Lines Covered = {linesCovered.First().Value} / {linesValid.First().Value}")
-                           .AppendLine($"Branch Rate = {branchRate * 100:N0}%, Branches Covered = {branchesCovered.First().Value} / {branchesValid.First().Value}");
+                summary.BranchesValid = int.Parse(branchesValid.First().Value);
 
                 // test coverage for individual packages
                 var packages = from item in coverage.Descendants("package")
@@ -86,21 +102,22 @@ namespace CodeCoverageSummary
 
                 foreach (var item in packages)
                 {
-                    string pName = item.Attribute("name").Value;
-                    double pLineRate = double.Parse(item.Attribute("line-rate").Value);
-                    double pBranchRate = double.Parse(item.Attribute("branch-rate").Value);
-                    int pComplexity = int.Parse(item.Attribute("complexity").Value);
-                    summaryText.AppendLine($"{pName}: Line Rate = {pLineRate * 100:N0}%, Branch Rate = {pBranchRate * 100:N0}%, Complexity = {pComplexity}");
+                    CodeCoverage packageCoverage = new()
+                    {
+                        Name = item.Attribute("name").Value,
+                        LineRate = double.Parse(item.Attribute("line-rate").Value),
+                        BranchRate = double.Parse(item.Attribute("branch-rate").Value),
+                        Complexity = int.Parse(item.Attribute("complexity").Value)
+                    };
+                    summary.Packages.Add(packageCoverage);
                 }
 
-                summaryText.AppendLine();
-
-                return summaryText.ToString();
+                return summary;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Parse Error: {ex.Message}");
-                return string.Empty;
+                return null;
             }
         }
     }
