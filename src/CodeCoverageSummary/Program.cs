@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommandLine;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,21 +9,33 @@ namespace CodeCoverageSummary
 {
     internal static class Program
     {
-        private const string _filename = "D:\\Dev\\Csharp\\CodeCoverageSummary\\coverage.cobertura.xml";
+        //private const string _filename = "D:\\Dev\\Csharp\\CodeCoverageSummary\\coverage.cobertura.xml";
 
         private static int Main(string[] args)
         {
-            Console.WriteLine($"Parsing Code Coverage File: {_filename}{Environment.NewLine}");
-            string summary = ParseTestResults(_filename);
-            if (string.IsNullOrWhiteSpace(summary))
-            {
-                return -3;
-            }
-            else
-            {
-                Console.WriteLine(summary);
-                return 0;
-            }
+            return Parser.Default.ParseArguments<CommandLineOptions>(args)
+                                       .MapResult<CommandLineOptions, int>(o =>
+                                       {
+                                           try
+                                           {
+                                               Console.WriteLine($"Parsing Code Coverage File: {o.Filename}{Environment.NewLine}");
+                                               string summary = ParseTestResults(o.Filename);
+                                               if (string.IsNullOrWhiteSpace(summary))
+                                               {
+                                                   return -2; // error
+                                               }
+                                               else
+                                               {
+                                                   Console.WriteLine(summary);
+                                                   return 0; // success
+                                               }
+                                           }
+                                           catch
+                                           {
+                                               return -3; // unhandled error
+                                           }
+                                       },
+                                       errs => -1); // invalid arguments
         }
 
         private static string ParseTestResults(string filename)
