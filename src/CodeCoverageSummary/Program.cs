@@ -26,12 +26,38 @@ namespace CodeCoverageSummary
                                                }
                                                else
                                                {
+                                                   string badgeUrl = null;
+
+                                                   if (o.Badge)
+                                                   {
+                                                       string colour;
+                                                       if (summary.LineRate < 0.5)
+                                                       {
+                                                           colour = "critical";
+                                                       }
+                                                       else if (summary.LineRate < 0.7)
+                                                       {
+                                                           colour = "yellow";
+                                                       }
+                                                       else
+                                                       {
+                                                           colour = "success";
+                                                       }
+                                                       badgeUrl = $"https://img.shields.io/badge/Code%20Coverage-{summary.LineRate * 100:N0}%25-{colour}?style=flat";
+                                                   }
+
                                                    StringBuilder summaryText = new();
                                                    if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
                                                    {
+                                                       if (string.IsNullOrWhiteSpace(badgeUrl))
+                                                       {
+                                                           summaryText.AppendLine(badgeUrl);
+                                                       }
+
                                                        summaryText.AppendLine($"Line Rate = {summary.LineRate * 100:N0}%, Lines Covered = {summary.LinesCovered} / {summary.LinesValid}")
                                                                   .AppendLine($"Branch Rate = {summary.BranchRate * 100:N0}%, Branches Covered = {summary.BranchesCovered} / {summary.BranchesValid}")
                                                                   .AppendLine($"Complexity = {summary.Complexity}");
+
                                                        foreach (CodeCoverage package in summary.Packages)
                                                        {
                                                            summaryText.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity}");
@@ -39,12 +65,19 @@ namespace CodeCoverageSummary
                                                    }
                                                    else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                                                    {
+                                                       if (!string.IsNullOrWhiteSpace(badgeUrl))
+                                                       {
+                                                           summaryText.AppendLine($"![Code Coverage]({badgeUrl})");
+                                                       }
+
                                                        summaryText.AppendLine("Package | Line Rate | Branch Rate | Complexity")
                                                                   .AppendLine("-------- | --------- | ----------- | ----------");
+
                                                        foreach (CodeCoverage package in summary.Packages)
                                                        {
                                                            summaryText.AppendLine($"{package.Name} | {package.LineRate * 100:N0}% | {package.BranchRate * 100:N0}% | {package.Complexity}");
                                                        }
+
                                                        summaryText.Append($"**Summary** | **{summary.LineRate * 100:N0}%** ({summary.LinesCovered} / {summary.LinesValid}) | ")
                                                                   .AppendLine($"**{summary.BranchRate * 100:N0}%** ({summary.BranchesCovered} / {summary.BranchesValid}) | {summary.Complexity}");
                                                    }

@@ -9,5 +9,8 @@ namespace CodeCoverageSummary
 
         [Option(shortName: 'f', longName: "format", Required = false, HelpText = "Output Format.", Default = "text")]
         public string Format { get; set; }
+
+        [Option(shortName: 'b', longName: "badge", Required = false, HelpText = "Include a badge in the output.", Default = false)]
+        public bool Badge { get; set; }
     }
 }
