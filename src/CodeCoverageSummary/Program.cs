@@ -37,6 +37,17 @@ namespace CodeCoverageSummary
                                                            summaryText.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity}");
                                                        }
                                                    }
+                                                   else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
+                                                   {
+                                                       summaryText.AppendLine("Package | Line Rate | Branch Rate | Complexity")
+                                                                  .AppendLine("-------- | --------- | ----------- | ----------");
+                                                       foreach (CodeCoverage package in summary.Packages)
+                                                       {
+                                                           summaryText.AppendLine($"{package.Name} | {package.LineRate * 100:N0}% | {package.BranchRate * 100:N0}% | {package.Complexity}");
+                                                       }
+                                                       summaryText.Append($"**Summary** | **{summary.LineRate * 100:N0}%** ({summary.LinesCovered} / {summary.LinesValid}) | ")
+                                                                  .AppendLine($"**{summary.BranchRate * 100:N0}%** ({summary.BranchesCovered} / {summary.BranchesValid}) | {summary.Complexity}");
+                                                   }
                                                    else
                                                    {
                                                        Console.WriteLine("Error: Unknown output format.");
