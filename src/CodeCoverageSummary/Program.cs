@@ -30,7 +30,8 @@ namespace CodeCoverageSummary
                                                    if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
                                                    {
                                                        summaryText.AppendLine($"Line Rate = {summary.LineRate * 100:N0}%, Lines Covered = {summary.LinesCovered} / {summary.LinesValid}")
-                                                                  .AppendLine($"Branch Rate = {summary.BranchRate * 100:N0}%, Branches Covered = {summary.BranchesCovered} / {summary.BranchesValid}");
+                                                                  .AppendLine($"Branch Rate = {summary.BranchRate * 100:N0}%, Branches Covered = {summary.BranchesCovered} / {summary.BranchesValid}")
+                                                                  .AppendLine($"Complexity = {summary.Complexity}");
                                                        foreach (CodeCoverage package in summary.Packages)
                                                        {
                                                            summaryText.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity}");
@@ -96,6 +97,8 @@ namespace CodeCoverageSummary
                                     select item;
                 summary.BranchesValid = int.Parse(branchesValid.First().Value);
 
+                summary.Complexity = 0;
+
                 // test coverage for individual packages
                 var packages = from item in coverage.Descendants("package")
                                select item;
@@ -110,6 +113,7 @@ namespace CodeCoverageSummary
                         Complexity = int.Parse(item.Attribute("complexity").Value)
                     };
                     summary.Packages.Add(packageCoverage);
+                    summary.Complexity += packageCoverage.Complexity;
                 }
 
                 return summary;

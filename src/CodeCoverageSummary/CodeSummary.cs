@@ -27,6 +27,8 @@ namespace CodeCoverageSummary
 
         public int BranchesValid { get; set; }
 
+        public int Complexity { get; set; }
+
         public List<CodeCoverage> Packages { get; set; }
 
         public CodeSummary()
