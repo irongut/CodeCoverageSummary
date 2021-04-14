@@ -20,4 +20,5 @@ jobs:
       run: dotnet restore src/CodeCoverageSummary.sln
     - name: Build CodeCoverageSummary
       run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore
-
+    - name: Run CodeCoverageSummary with sample file
+      run: dotnet src/CodeCoverageSummary/bin/Release/net5.0/CodeCoverageSummary.dll coverage.cobertura.xml
