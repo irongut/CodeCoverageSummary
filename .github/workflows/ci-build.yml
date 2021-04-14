@@ -1,0 +1,23 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: CI Build
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Restore Dependencies
+      run: dotnet restore src/CodeCoverageSummary.sln
+    - name: Build CodeCoverageSummary
+      run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore
+
