@@ -47,9 +47,10 @@ namespace CodeCoverageSummary
                                                    }
 
                                                    StringBuilder summaryText = new();
+                                                   string fileExt = "txt";
                                                    if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
                                                    {
-                                                       if (string.IsNullOrWhiteSpace(badgeUrl))
+                                                       if (!string.IsNullOrWhiteSpace(badgeUrl))
                                                        {
                                                            summaryText.AppendLine(badgeUrl);
                                                        }
@@ -65,6 +66,8 @@ namespace CodeCoverageSummary
                                                    }
                                                    else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                                                    {
+                                                       fileExt = "md";
+
                                                        if (!string.IsNullOrWhiteSpace(badgeUrl))
                                                        {
                                                            summaryText.AppendLine($"![Code Coverage]({badgeUrl})");
@@ -87,7 +90,16 @@ namespace CodeCoverageSummary
                                                        return -2; // error
                                                    }
 
-                                                   Console.WriteLine(summaryText.ToString());
+                                                   if (o.Output.Equals("console", StringComparison.OrdinalIgnoreCase) || o.Output.Equals("both", StringComparison.OrdinalIgnoreCase))
+                                                   {
+                                                       Console.WriteLine(summaryText.ToString());
+                                                   }
+
+                                                   if (o.Output.Equals("file", StringComparison.OrdinalIgnoreCase) || o.Output.Equals("both", StringComparison.OrdinalIgnoreCase))
+                                                   {
+                                                       File.WriteAllText($"code-coverage-results.{fileExt}", summaryText.ToString());
+                                                   }
+
                                                    return 0; // success
                                                }
                                            }

@@ -12,5 +12,8 @@ namespace CodeCoverageSummary
 
         [Option(shortName: 'b', longName: "badge", Required = false, HelpText = "Include a badge in the output - true / false (default).", Default = false)]
         public bool Badge { get; set; }
+
+        [Option(shortName: 'o', longName: "output", Required = false, HelpText = "Output Type - console (default), file or both.", Default = "console")]
+        public string Output { get; set; }
     }
 }
