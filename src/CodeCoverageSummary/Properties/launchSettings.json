@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "CodeCoverageSummary": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker",
+      "commandLineArgs": "/src/coverage.cobertura.xml --format=md --badge=true"
+    }
+  }
+}
