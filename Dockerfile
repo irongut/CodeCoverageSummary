@@ -11,6 +11,17 @@ RUN dotnet build CodeCoverageSummary/CodeCoverageSummary.csproj -c Release -o /a
 FROM build AS publish
 RUN dotnet publish CodeCoverageSummary/CodeCoverageSummary.csproj -c Release -o /app/publish
 
+# Label the container
+LABEL maintainer="Irongut <murray.dave@outlook.com>"
+LABEL repository="https://github.com/irongut/CodeCoverageSummary"
+LABEL homepage="https://github.com/irongut/CodeCoverageSummary"
+
+# Label as GitHub Action
+LABEL com.github.actions.name="Code Coverage Summary"
+LABEL com.github.actions.description="A GitHub Action that reads Cobertura format code coverage files and outputs a summary."
+LABEL com.github.actions.icon="book-open"
+LABEL com.github.actions.color="purple"
+
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
