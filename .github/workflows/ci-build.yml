@@ -29,5 +29,5 @@ jobs:
     - name: Test Action
       uses:  irongut/CodeCoverageSummary@master
       with:
-        filename: 'app/coverage.cobertura.xml'
+        filename: '/app/sample.coverage.xml'
         badge: 'true'
