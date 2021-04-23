@@ -23,7 +23,7 @@ jobs:
     - name: Run CodeCoverageSummary with sample file
       run: dotnet src/CodeCoverageSummary/bin/Release/net5.0/CodeCoverageSummary.dll src/coverage.cobertura.xml
     - name: Test Action
-      uses:  irongut/CodeCoverageSummary@main
+      uses:  irongut/CodeCoverageSummary@master
       with:
         filename: 'src/coverage.cobertura.xml'
         badge: 'true'
