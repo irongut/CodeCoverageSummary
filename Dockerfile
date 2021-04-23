@@ -22,4 +22,4 @@ FROM mcr.microsoft.com/dotnet/runtime:5.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 COPY --from=build /src/sample.coverage.xml .
-ENTRYPOINT ["dotnet", "CodeCoverageSummary.dll"]
+ENTRYPOINT ["dotnet", "/app/CodeCoverageSummary.dll"]
