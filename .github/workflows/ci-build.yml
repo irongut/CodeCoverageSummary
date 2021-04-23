@@ -22,3 +22,8 @@ jobs:
       run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore
     - name: Run CodeCoverageSummary with sample file
       run: dotnet src/CodeCoverageSummary/bin/Release/net5.0/CodeCoverageSummary.dll src/coverage.cobertura.xml
+    - name: Test Action
+      uses:  irongut/CodeCoverageSummary@main
+      with:
+        filename: 'src/coverage.cobertura.xml'
+        badge: 'true'
