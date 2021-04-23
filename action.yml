@@ -8,16 +8,18 @@ inputs:
   filename:
     description: 'Code coverage file to analyse.'
     required: true
-    default: ''
   badge:
     description: 'Include a badge in the output - true / false (default).'
     required: false
+    default: 'false'
   format:
     description: 'Output Format - markdown or text (default).'
     required: false
+    default: 'text'
   output:
     description: 'Output Type - console (default), file or both.'
     required: false
+    default: 'console'
 runs:
   using: 'docker'
   image: 'Dockerfile'
