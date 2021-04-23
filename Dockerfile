@@ -21,5 +21,5 @@ LABEL com.github.actions.color="purple"
 FROM mcr.microsoft.com/dotnet/runtime:5.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
-COPY --from=build src/CodeCoverageSummary/sample.coverage.xml .
+COPY --from=build /src/sample.coverage.xml .
 ENTRYPOINT ["dotnet", "CodeCoverageSummary.dll"]
