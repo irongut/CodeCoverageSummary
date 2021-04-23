@@ -16,14 +16,18 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
+
     - name: Restore Dependencies
       run: dotnet restore src/CodeCoverageSummary.sln
+
     - name: Build CodeCoverageSummary
       run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore
+
     - name: Run CodeCoverageSummary with sample file
-      run: dotnet src/CodeCoverageSummary/bin/Release/net5.0/CodeCoverageSummary.dll src/coverage.cobertura.xml
+      run: dotnet src/CodeCoverageSummary/bin/Release/net5.0/CodeCoverageSummary.dll src/coverage.cobertura.xml --badge true
+
     - name: Test Action
       uses:  irongut/CodeCoverageSummary@master
       with:
-        filename: 'src/coverage.cobertura.xml'
+        filename: 'app/coverage.cobertura.xml'
         badge: 'true'
