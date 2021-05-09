@@ -1,28 +1,31 @@
 # Code Coverage Summary Action
 
+WORK IN PROGRESS
+
 A GitHub Action to analyse test code coverage in Cobertura format and output a summary.
 
 Written for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) on .Net but it should work with any tests that output coverage in Cobertura format.
 
 ## Inputs
 
-### `filename`
+#### `filename`
+**Required**
 
-**Required** Code coverage file to analyse.
+Code coverage file to analyse.
 
 Note: Coverlet creates the coverage file in a random named directory (guid) so you need to copy it to a predictable path before running this Action, see [.Net 5 Workflow Example](#net-5-workflow-example) below.
 
-### `badge`
+#### `badge`
 
 Include a badge in the output using [shields.io](https://shields.io/) - `true` or `false` (default).
 
 If code coverage is less than 50% the badge will be red, if coverage is 50% - 74% it will be yellow and if coverage is 75% or over it will be green. 
 
-### `format`
+#### `format`
 
 Output Format - `markdown` or `text` (default).
 
-### `output`
+#### `output`
 
 Output Type - `console` (default), `file` or `both`.
 
@@ -44,11 +47,11 @@ Company.Example: Line Rate = 78%, Branch Rate = 60%, Complexity = 906
 Company.Example.Library: Line Rate = 27%, Branch Rate = 100%, Complexity = 11
 ```
 
-## Example Usage
+## Usage
 
 ```yaml
 name: Code Coverage Summary Report
-uses:  irongut/CodeCoverageSummary@master
+uses: irongut/CodeCoverageSummary@master
 with:
   filename: coverage/coverage.cobertura.xml
 ```
@@ -90,7 +93,7 @@ jobs:
       run: cp coverage/**/coverage.cobertura.xml coverage/coverage.cobertura.xml
 
     - name: Code Coverage Summary Report
-      uses:  irongut/CodeCoverageSummary@master
+      uses: irongut/CodeCoverageSummary@master
       with:
         filename: coverage/coverage.cobertura.xml
         badge: 'true'
