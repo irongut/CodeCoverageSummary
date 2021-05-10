@@ -1,6 +1,6 @@
 name: 'Code Coverage Summary'
 author: 'Irongut <murray.dave@outlook.com>'
-description: 'A GitHub Action that reads Cobertura format code coverage files and outputs a summary.'
+description: 'A GitHub Action that reads Cobertura format code coverage files and outputs a text or markdown summary.'
 branding:
   icon: book-open
   color: purple
