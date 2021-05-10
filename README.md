@@ -52,7 +52,7 @@ Company.Example.Library: Line Rate = 27%, Branch Rate = 100%, Complexity = 11
 
 ```yaml
 name: Code Coverage Summary Report
-uses: irongut/CodeCoverageSummary@v1
+uses: irongut/CodeCoverageSummary@v1.0
 with:
   filename: coverage/coverage.cobertura.xml
 ```
@@ -94,7 +94,7 @@ jobs:
       run: cp coverage/**/coverage.cobertura.xml coverage/coverage.cobertura.xml
 
     - name: Code Coverage Summary Report
-      uses: irongut/CodeCoverageSummary@v1
+      uses: irongut/CodeCoverageSummary@v1.0
       with:
         filename: coverage/coverage.cobertura.xml
         badge: true
