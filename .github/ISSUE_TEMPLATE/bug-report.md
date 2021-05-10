@@ -11,17 +11,15 @@ assignees: irongut
 
 Provide a short description of the bug with any error message.
 
-### Stack Trace
-```c#
-Add​ ​a​ ​stack​ ​trace​ ​if​ ​available​.
+### Workflow File
+```yaml
+Add the​ ​relevant parts of your workflow, if possible.
 ```
 
-### To Reproduce
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Scroll down to '....'
-3. Click on '....'
-4. See error
+### Actions Log
+```
+Add​ the ​relevant part of the GitHub Actions log, if possible.
+```
 
 ### Expected Behavior
 A clear and concise description of what you expected to happen.
