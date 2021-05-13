@@ -1,8 +1,8 @@
 # Code Coverage Summary
 
-A GitHub Action that reads Cobertura format code coverage files and outputs a text or markdown summary. Other Actions can then post the summary as a pull request comment, include it in release notes, etc.
+A GitHub Action that reads Cobertura format code coverage files from your test suite and outputs a text or markdown summary. This summary can then be posted as a Pull Request comment, included in Release Notes, etc by another action to give you an immediate insight into the health of your code without using a third-party site.
 
-Written for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) and .Net but it should work with any tests that output coverage in Cobertura format.
+Code Coverage Summary was designed for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) and .Net but it should work with any test framework that outputs coverage in Cobertura format.
 
 ## Inputs
 
@@ -52,7 +52,7 @@ Company.Example.Library: Line Rate = 27%, Branch Rate = 100%, Complexity = 11
 
 ```yaml
 name: Code Coverage Summary Report
-uses: irongut/CodeCoverageSummary@v1.0
+uses: irongut/CodeCoverageSummary@v1.0.1
 with:
   filename: coverage/coverage.cobertura.xml
 ```
@@ -94,7 +94,7 @@ jobs:
       run: cp coverage/**/coverage.cobertura.xml coverage/coverage.cobertura.xml
 
     - name: Code Coverage Summary Report
-      uses: irongut/CodeCoverageSummary@v1.0
+      uses: irongut/CodeCoverageSummary@v1.0.1
       with:
         filename: coverage/coverage.cobertura.xml
         badge: true
@@ -115,7 +115,7 @@ jobs:
 
 Please make sure the bug is not already reported by searching existing [issues].
 
-If you're unable to find an existing issue addressing the problem [open a new one][new-issue]. Be sure to include a title and clear description, as much relevant information as possible, a workflow sample and any logs demonstrating the problem.
+If you're unable to find an existing issue addressing the problem please [open a new one][new-issue]. Be sure to include a title and clear description, as much relevant information as possible, a workflow sample and any logs demonstrating the problem.
 
 ### Suggest an Enhancement
 
