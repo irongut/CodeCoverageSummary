@@ -204,6 +204,7 @@ namespace CodeCoverageSummary
             if (!string.IsNullOrWhiteSpace(badgeUrl))
             {
                 markdownOutput.AppendLine($"![Code Coverage]({badgeUrl})");
+                markdownOutput.AppendLine("");
             }
 
             markdownOutput.AppendLine("Package | Line Rate | Branch Rate | Complexity")
