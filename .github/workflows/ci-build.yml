@@ -11,8 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     name: CI Build
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Setup .Net
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
@@ -23,11 +25,5 @@ jobs:
     - name: Build CodeCoverageSummary
       run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore
 
-    - name: Run CodeCoverageSummary with sample file
+    - name: Test with sample file
       run: dotnet src/CodeCoverageSummary/bin/Release/net5.0/CodeCoverageSummary.dll src/coverage.cobertura.xml --badge true
-
-    - name: Test Action
-      uses:  irongut/CodeCoverageSummary@master
-      with:
-        filename: '/app/sample.coverage.xml'
-        badge: 'true'
