@@ -9,83 +9,81 @@ namespace CodeCoverageSummary
 {
     internal static class Program
     {
-        // test file: /Dev/Csharp/CodeCoverageSummary/coverage.cobertura.xml
-
         private static int Main(string[] args)
         {
             return Parser.Default.ParseArguments<CommandLineOptions>(args)
-                                       .MapResult(o =>
-                                       {
-                                           try
-                                           {
-                                               if (!File.Exists(o.Filename))
-                                               {
-                                                   Console.WriteLine("Error: Code coverage file not found.");
-                                                   return -2; // error
-                                               }
+                                 .MapResult(o =>
+                                 {
+                                     try
+                                     {
+                                         if (!File.Exists(o.Filename))
+                                         {
+                                             Console.WriteLine("Error: Code coverage file not found.");
+                                             return -2; // error
+                                         }
 
-                                               // parse code coverage file
-                                               Console.WriteLine($"Code Coverage File: {o.Filename}");
-                                               CodeSummary summary = ParseTestResults(o.Filename);
-                                               if (summary == null)
-                                               {
-                                                   Console.WriteLine("Error: Parsing code coverage file.");
-                                                   return -2; // error
-                                               }
-                                               else
-                                               {
-                                                   // generate badge
-                                                   string badgeUrl = o.Badge ? GenerateBadge(summary) : null;
+                                         // parse code coverage file
+                                         Console.WriteLine($"Code Coverage File: {o.Filename}");
+                                         CodeSummary summary = ParseTestResults(o.Filename);
+                                         if (summary == null)
+                                         {
+                                             Console.WriteLine("Error: Parsing code coverage file.");
+                                             return -2; // error
+                                         }
+                                         else
+                                         {
+                                             // generate badge
+                                             string badgeUrl = o.Badge ? GenerateBadge(summary) : null;
 
-                                                   // generate output
-                                                   string output;
-                                                   string fileExt;
-                                                   if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
-                                                   {
-                                                       fileExt = "txt";
-                                                       output = GenerateTextOutput(summary, badgeUrl);
-                                                   }
-                                                   else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
-                                                   {
-                                                       fileExt = "md";
-                                                       output = GenerateMarkdownOutput(summary, badgeUrl);
-                                                   }
-                                                   else
-                                                   {
-                                                       Console.WriteLine("Error: Unknown output format.");
-                                                       return -2; // error
-                                                   }
+                                             // generate output
+                                             string output;
+                                             string fileExt;
+                                             if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
+                                             {
+                                                 fileExt = "txt";
+                                                 output = GenerateTextOutput(summary, badgeUrl);
+                                             }
+                                             else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
+                                             {
+                                                 fileExt = "md";
+                                                 output = GenerateMarkdownOutput(summary, badgeUrl);
+                                             }
+                                             else
+                                             {
+                                                 Console.WriteLine("Error: Unknown output format.");
+                                                 return -2; // error
+                                             }
 
-                                                   // output
-                                                   if (o.Output.Equals("console", StringComparison.OrdinalIgnoreCase))
-                                                   {
-                                                       Console.WriteLine(output);
-                                                   }
-                                                   else if (o.Output.Equals("file", StringComparison.OrdinalIgnoreCase))
-                                                   {
-                                                       File.WriteAllText($"code-coverage-results.{fileExt}", output);
-                                                   }
-                                                   else if (o.Output.Equals("both", StringComparison.OrdinalIgnoreCase))
-                                                   {
-                                                       Console.WriteLine(output);
-                                                       File.WriteAllText($"code-coverage-results.{fileExt}", output);
-                                                   }
-                                                   else
-                                                   {
-                                                       Console.WriteLine("Error: Unknown output type.");
-                                                       return -2; // error
-                                                   }
+                                             // output
+                                             if (o.Output.Equals("console", StringComparison.OrdinalIgnoreCase))
+                                             {
+                                                 Console.WriteLine(output);
+                                             }
+                                             else if (o.Output.Equals("file", StringComparison.OrdinalIgnoreCase))
+                                             {
+                                                 File.WriteAllText($"code-coverage-results.{fileExt}", output);
+                                             }
+                                             else if (o.Output.Equals("both", StringComparison.OrdinalIgnoreCase))
+                                             {
+                                                 Console.WriteLine(output);
+                                                 File.WriteAllText($"code-coverage-results.{fileExt}", output);
+                                             }
+                                             else
+                                             {
+                                                 Console.WriteLine("Error: Unknown output type.");
+                                                 return -2; // error
+                                             }
 
-                                                   return 0; // success
-                                               }
-                                           }
-                                           catch (Exception ex)
-                                           {
-                                               Console.WriteLine($"Error: {ex.GetType()} - {ex.Message}");
-                                               return -3; // unhandled error
-                                           }
-                                       },
-                                       errs => -1); // invalid arguments
+                                             return 0; // success
+                                         }
+                                     }
+                                     catch (Exception ex)
+                                     {
+                                         Console.WriteLine($"Error: {ex.GetType()} - {ex.Message}");
+                                         return -3; // unhandled error
+                                     }
+                                 },
+                                 _ => -1); // invalid arguments
         }
 
         private static CodeSummary ParseTestResults(string filename)
