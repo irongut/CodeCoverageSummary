@@ -141,7 +141,7 @@ namespace CodeCoverageSummary
                         Name = item.Attribute("name").Value,
                         LineRate = double.Parse(item.Attribute("line-rate").Value),
                         BranchRate = double.Parse(item.Attribute("branch-rate").Value),
-                        Complexity = int.Parse(item.Attribute("complexity").Value)
+                        Complexity = int.Parse(item.Attribute("complexity")?.Value ?? "0")
                     };
                     summary.Packages.Add(packageCoverage);
                     summary.Complexity += packageCoverage.Complexity;
