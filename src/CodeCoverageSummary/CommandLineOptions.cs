@@ -7,13 +7,13 @@ namespace CodeCoverageSummary
         [Value(index: 0, Required = true, HelpText = "Code coverage file to analyse.")]
         public string Filename { get; set; }
 
-        [Option(shortName: 'b', longName: "badge", Required = false, HelpText = "Include a badge in the output - true / false.", Default = false)]
+        [Option(longName: "badge", Required = false, HelpText = "Include a badge reporting the Line Rate coverage in the output using shields.io - true or false.", Default = false)]
         public bool Badge { get; set; }
 
-        [Option(shortName: 'f', longName: "format", Required = false, HelpText = "Output Format - markdown or text.", Default = "text")]
+        [Option(longName: "format", Required = false, HelpText = "Output Format - markdown or text.", Default = "text")]
         public string Format { get; set; }
 
-        [Option(shortName: 'o', longName: "output", Required = false, HelpText = "Output Type - console, file or both.", Default = "console")]
+        [Option(longName: "output", Required = false, HelpText = "Output Type - console, file or both.", Default = "console")]
         public string Output { get; set; }
     }
 }
