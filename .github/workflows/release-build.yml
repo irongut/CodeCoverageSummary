@@ -15,6 +15,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Setup .Net
       uses: actions/setup-dotnet@v1
@@ -29,6 +31,28 @@ jobs:
 
     - name: Test with sample file
       run: dotnet src/CodeCoverageSummary/bin/Release/net5.0/CodeCoverageSummary.dll src/coverage.cobertura.xml --badge true
+
+    - name: Get Previous Tag
+      id: get_previous_tag
+      run: |
+        PREV_TAG=$(git describe --abbrev=0 --tags "${{ github.ref }}^")
+        echo "::set-output name=baseRef::${PREV_TAG}"
+
+    - name: Generate Changelog
+      id: generate_changelog
+      uses: nblagoev/pull-release-notes-action@v1.0.2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        base-ref: ${{ steps.get_previous_tag.outputs.baseRef }}
+        head-ref: ${{ github.ref }}
+
+    - name: Add Changelog to Release
+      uses: irongut/EditRelease@v1.0.0
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        id: ${{ github.event.release.id }}
+        body: ${{steps.generate_changelog.outputs.result}}
 
   deploy:
     name: Deploy to GHCR
