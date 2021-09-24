@@ -6,14 +6,15 @@
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <Company>Taranis Software</Company>
     <Authors>Irongut</Authors>
-    <Description>A GitHub Action that reads Cobertura format code coverage files and outputs a summary.</Description>
+    <Description>A GitHub Action that reads Cobertura format code coverage files and outputs a text or markdown summary.</Description>
     <Copyright>Copyright © 2021 Taranis Software</Copyright>
     <PackageId>Taranis.CodeCoverageSummary</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/irongut/CodeCoverageSummary</PackageProjectUrl>
     <RepositoryUrl>https://github.com/irongut/CodeCoverageSummary</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>code-coverage cobertura coverlet</PackageTags>
+    <PackageTags>coverage test-coverage cobertura action code-coverage coverlet github-actions</PackageTags>
+    <Version>1.0.3</Version>
   </PropertyGroup>
 
   <ItemGroup>

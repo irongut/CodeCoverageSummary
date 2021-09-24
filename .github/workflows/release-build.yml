@@ -52,7 +52,7 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         id: ${{ github.event.release.id }}
-        body: ${{steps.generate_changelog.outputs.result}}
+        body: ${{ steps.generate_changelog.outputs.result }}
 
   deploy:
     name: Deploy to GHCR
