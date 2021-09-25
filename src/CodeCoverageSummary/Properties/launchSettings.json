@@ -1,7 +1,8 @@
 {
   "profiles": {
     "CodeCoverageSummary": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "../../../../coverage.gcovr.xml --format=md --badge=true"
     },
     "Docker": {
       "commandName": "Docker",

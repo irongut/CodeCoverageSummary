@@ -10,7 +10,7 @@ namespace CodeCoverageSummary
 
         public double BranchRate { get; set; }
 
-        public int Complexity { get; set; }
+        public double Complexity { get; set; }
     }
 
     public class CodeSummary
@@ -27,7 +27,7 @@ namespace CodeCoverageSummary
 
         public int BranchesValid { get; set; }
 
-        public int Complexity { get; set; }
+        public double Complexity { get; set; }
 
         public List<CodeCoverage> Packages { get; set; }
 
