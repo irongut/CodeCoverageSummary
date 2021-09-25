@@ -22,7 +22,7 @@ inputs:
     default: 'console'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/irongut/codecoveragesummary:v1.0.3'
+  image: 'docker://ghcr.io/irongut/codecoveragesummary:v1.0.4'
   args:
     - ${{ inputs.filename }}
     - '--badge'

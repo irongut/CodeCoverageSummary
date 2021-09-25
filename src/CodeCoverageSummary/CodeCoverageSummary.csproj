@@ -14,7 +14,7 @@
     <RepositoryUrl>https://github.com/irongut/CodeCoverageSummary</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>coverage test-coverage cobertura action code-coverage coverlet github-actions</PackageTags>
-    <Version>1.0.3</Version>
+    <Version>1.0.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
