@@ -134,17 +134,19 @@ namespace CodeCoverageSummary
                 var packages = from item in coverage.Descendants("package")
                                select item;
 
+                int i = 1;
                 foreach (var item in packages)
                 {
                     CodeCoverage packageCoverage = new()
                     {
-                        Name = item.Attribute("name").Value,
+                        Name = string.IsNullOrWhiteSpace(item.Attribute("name").Value) ? $"Package {i}" : item.Attribute("name").Value,
                         LineRate = double.Parse(item.Attribute("line-rate")?.Value ?? "0"),
                         BranchRate = double.Parse(item.Attribute("branch-rate")?.Value ?? "0"),
                         Complexity = double.Parse(item.Attribute("complexity")?.Value ?? "0")
                     };
                     summary.Packages.Add(packageCoverage);
                     summary.Complexity += packageCoverage.Complexity;
+                    i++;
                 }
 
                 return summary;
@@ -240,7 +242,7 @@ namespace CodeCoverageSummary
 
             if (summary.Complexity % 1 == 0)
             {
-                markdownOutput.AppendLine($"{summary.Complexity}");
+                markdownOutput.AppendLine(summary.Complexity.ToString());
             }
             else
             {
