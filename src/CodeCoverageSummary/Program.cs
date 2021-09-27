@@ -194,7 +194,7 @@ namespace CodeCoverageSummary
             }
             else
             {
-                textOutput.AppendLine($"Complexity = {summary.Complexity * 100:N0}%");
+                textOutput.AppendLine($"Complexity = {summary.Complexity:N4}");
             }
 
             foreach (CodeCoverage package in summary.Packages)
@@ -205,7 +205,7 @@ namespace CodeCoverageSummary
                 }
                 else
                 {
-                    textOutput.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity * 100:N0}%");
+                    textOutput.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity:N4}");
                 }
             }
 
@@ -233,7 +233,7 @@ namespace CodeCoverageSummary
                 }
                 else
                 {
-                    markdownOutput.AppendLine($"{package.Name} | {package.LineRate * 100:N0}% | {package.BranchRate * 100:N0}% | {package.Complexity * 100:N0}%");
+                    markdownOutput.AppendLine($"{package.Name} | {package.LineRate * 100:N0}% | {package.BranchRate * 100:N0}% | {package.Complexity:N4}");
                 }
             }
 
@@ -246,7 +246,7 @@ namespace CodeCoverageSummary
             }
             else
             {
-                markdownOutput.AppendLine($"{summary.Complexity * 100:N0}%");
+                markdownOutput.AppendLine(summary.Complexity.ToString("N4"));
             }
 
             return markdownOutput.ToString();
