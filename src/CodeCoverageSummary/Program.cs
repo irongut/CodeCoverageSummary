@@ -134,17 +134,19 @@ namespace CodeCoverageSummary
                 var packages = from item in coverage.Descendants("package")
                                select item;
 
+                int i = 1;
                 foreach (var item in packages)
                 {
                     CodeCoverage packageCoverage = new()
                     {
-                        Name = item.Attribute("name").Value,
-                        LineRate = double.Parse(item.Attribute("line-rate").Value),
-                        BranchRate = double.Parse(item.Attribute("branch-rate").Value),
-                        Complexity = int.Parse(item.Attribute("complexity")?.Value ?? "0")
+                        Name = string.IsNullOrWhiteSpace(item.Attribute("name").Value) ? $"Package {i}" : item.Attribute("name").Value,
+                        LineRate = double.Parse(item.Attribute("line-rate")?.Value ?? "0"),
+                        BranchRate = double.Parse(item.Attribute("branch-rate")?.Value ?? "0"),
+                        Complexity = double.Parse(item.Attribute("complexity")?.Value ?? "0")
                     };
                     summary.Packages.Add(packageCoverage);
                     summary.Complexity += packageCoverage.Complexity;
+                    i++;
                 }
 
                 return summary;
@@ -184,12 +186,27 @@ namespace CodeCoverageSummary
             }
 
             textOutput.AppendLine($"Line Rate = {summary.LineRate * 100:N0}%, Lines Covered = {summary.LinesCovered} / {summary.LinesValid}")
-                      .AppendLine($"Branch Rate = {summary.BranchRate * 100:N0}%, Branches Covered = {summary.BranchesCovered} / {summary.BranchesValid}")
-                      .AppendLine($"Complexity = {summary.Complexity}");
+                      .AppendLine($"Branch Rate = {summary.BranchRate * 100:N0}%, Branches Covered = {summary.BranchesCovered} / {summary.BranchesValid}");
+
+            if (summary.Complexity % 1 == 0)
+            {
+                textOutput.AppendLine($"Complexity = {summary.Complexity}");
+            }
+            else
+            {
+                textOutput.AppendLine($"Complexity = {summary.Complexity:N4}");
+            }
 
             foreach (CodeCoverage package in summary.Packages)
             {
-                textOutput.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity}");
+                if (package.Complexity % 1 == 0)
+                {
+                    textOutput.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity}");
+                }
+                else
+                {
+                    textOutput.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity:N4}");
+                }
             }
 
             return textOutput.ToString();
@@ -210,11 +227,27 @@ namespace CodeCoverageSummary
 
             foreach (CodeCoverage package in summary.Packages)
             {
-                markdownOutput.AppendLine($"{package.Name} | {package.LineRate * 100:N0}% | {package.BranchRate * 100:N0}% | {package.Complexity}");
+                if (package.Complexity % 1 == 0)
+                {
+                    markdownOutput.AppendLine($"{package.Name} | {package.LineRate * 100:N0}% | {package.BranchRate * 100:N0}% | {package.Complexity}");
+                }
+                else
+                {
+                    markdownOutput.AppendLine($"{package.Name} | {package.LineRate * 100:N0}% | {package.BranchRate * 100:N0}% | {package.Complexity:N4}");
+                }
             }
 
             markdownOutput.Append($"**Summary** | **{summary.LineRate * 100:N0}%** ({summary.LinesCovered} / {summary.LinesValid}) | ")
-                          .AppendLine($"**{summary.BranchRate * 100:N0}%** ({summary.BranchesCovered} / {summary.BranchesValid}) | {summary.Complexity}");
+                          .Append($"**{summary.BranchRate * 100:N0}%** ({summary.BranchesCovered} / {summary.BranchesValid}) | ");
+
+            if (summary.Complexity % 1 == 0)
+            {
+                markdownOutput.AppendLine(summary.Complexity.ToString());
+            }
+            else
+            {
+                markdownOutput.AppendLine(summary.Complexity.ToString("N4"));
+            }
 
             return markdownOutput.ToString();
         }
