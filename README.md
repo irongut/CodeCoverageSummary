@@ -1,8 +1,10 @@
 # Code Coverage Summary
 
-A GitHub Action that reads Cobertura format code coverage files from your test suite and outputs a text or markdown summary. This summary can then be posted as a Pull Request comment, included in Release Notes, etc by another action to give you an immediate insight into the health of your code without using a third-party site.
+A GitHub Action that reads Cobertura format code coverage files from your test suite and outputs a text or markdown summary. This summary can be posted as a Pull Request comment or included in Release Notes by other actions to give you an immediate insight into the health of your code without using a third-party site.
 
-Code Coverage Summary was designed for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) and .Net but it should work with any test framework that outputs coverage in Cobertura format.
+Code Coverage Summary is designed for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) and [gcovr](https://github.com/gcovr/gcovr) but it should work with any test framework that outputs coverage in Cobertura format.
+
+As a Docker based action Code Coverage Summary requires a Linux runner, see [Types of Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions). If you need to build with a Windows or MacOS runner a workaround would be to upload the coverage file as an artifact and use a seperate job with a Linux runner to generate the summary.
 
 ## Inputs
 
