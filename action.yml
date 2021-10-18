@@ -9,19 +9,23 @@ inputs:
     description: 'Code coverage file to analyse.'
     required: true
   badge:
-    description: 'Include a badge in the output - true / false (default).'
+    description: 'Include a Line Rate coverage badge in the output using shields.io - true / false (default).'
     required: false
     default: 'false'
   format:
     description: 'Output Format - markdown or text (default).'
     required: false
     default: 'text'
+  indicators:
+    description: 'Include health indicators in the output - true (default) / false.'
+    required: false
+    default: 'true'
   output:
     description: 'Output Type - console (default), file or both.'
     required: false
     default: 'console'
   thresholds:
-    description: 'Badge colour threshold percentages, default '50 75'.'
+    description: 'Badge and health indicator threshold percentages, default '50 75'.'
     required: false
     default: '50 75'
 runs:
@@ -33,6 +37,8 @@ runs:
     - ${{ inputs.badge }}
     - '--format'
     - ${{ inputs.format }}
+    - '--indicators'
+    - ${{ inputs.indicators }}
     - '--output'
     - ${{ inputs.output }}
     - '--thresholds'
