@@ -13,6 +13,9 @@ namespace CodeCoverageSummary
         [Option(longName: "format", Required = false, HelpText = "Output Format - markdown or text.", Default = "text")]
         public string Format { get; set; }
 
+        [Option(longName: "indicators", Required = false, HelpText = "Include package health indicators in the output - true or false.", Default = true)]
+        public bool Indicators { get; set; }
+
         [Option(longName: "output", Required = false, HelpText = "Output Type - console, file or both.", Default = "console")]
         public string Output { get; set; }
 
