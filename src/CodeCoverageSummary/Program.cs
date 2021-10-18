@@ -9,6 +9,9 @@ namespace CodeCoverageSummary
 {
     internal static class Program
     {
+        private static double lowerThreshold = 0.5;
+        private static double upperThreshold = 0.75;
+
         private static int Main(string[] args)
         {
             return Parser.Default.ParseArguments<CommandLineOptions>(args)
@@ -32,6 +35,10 @@ namespace CodeCoverageSummary
                                          }
                                          else
                                          {
+                                             // set health badge thresholds
+                                             if (!string.IsNullOrWhiteSpace(o.Thresholds))
+                                                 SetThresholds(o.Thresholds);
+
                                              // generate badge
                                              string badgeUrl = o.Badge ? GenerateBadge(summary) : null;
 
@@ -158,14 +165,49 @@ namespace CodeCoverageSummary
             }
         }
 
+        private static void SetThresholds(string thresholds)
+        {
+            int lowerPercentage;
+            int upperPercentage = (int)(upperThreshold * 100);
+            int s = thresholds.IndexOf(" ");
+            if (s == 0)
+            {
+                throw new ArgumentException("Threshold parameter set incorrectly.");
+            }
+            else if (s < 0)
+            {
+                if (!int.TryParse(thresholds, out lowerPercentage))
+                    throw new ArgumentException("Threshold parameter set incorrectly.");
+            }
+            else
+            {
+                if (!int.TryParse(thresholds.Substring(0, s), out lowerPercentage))
+                    throw new ArgumentException("Threshold parameter set incorrectly.");
+
+                if (!int.TryParse(thresholds.Substring(s + 1), out upperPercentage))
+                    throw new ArgumentException("Threshold parameter set incorrectly.");
+            }
+            lowerThreshold = lowerPercentage / 100.0;
+            upperThreshold = upperPercentage / 100.0;
+
+            if (lowerThreshold > 1.0)
+                lowerThreshold = 1.0;
+
+            if (lowerThreshold > upperThreshold)
+                upperThreshold = lowerThreshold + 0.1;
+
+            if (upperThreshold > 1.0)
+                upperThreshold = 1.0;
+        }
+
         private static string GenerateBadge(CodeSummary summary)
         {
             string colour;
-            if (summary.LineRate < 0.5)
+            if (summary.LineRate < lowerThreshold)
             {
                 colour = "critical";
             }
-            else if (summary.LineRate < 0.75)
+            else if (summary.LineRate < upperThreshold)
             {
                 colour = "yellow";
             }
