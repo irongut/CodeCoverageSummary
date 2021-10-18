@@ -16,7 +16,7 @@ namespace CodeCoverageSummary
         [Option(longName: "output", Required = false, HelpText = "Output Type - console, file or both.", Default = "console")]
         public string Output { get; set; }
 
-        [Option(longName: "thresholds", Required = false, HelpText = "Badge colour thresholds.", Default = "50 75")]
+        [Option(longName: "thresholds", Required = false, HelpText = "Badge colour threshold percentages.", Default = "50 75")]
         public string Thresholds { get; set; }
     }
 }

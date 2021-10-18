@@ -20,6 +20,10 @@ inputs:
     description: 'Output Type - console (default), file or both.'
     required: false
     default: 'console'
+  thresholds:
+    description: 'Badge colour threshold percentages, default '50 75'.'
+    required: false
+    default: '50 75'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/irongut/codecoveragesummary:v1.0.5'
@@ -31,3 +35,5 @@ runs:
     - ${{ inputs.format }}
     - '--output'
     - ${{ inputs.output }}
+    - '--thresholds'
+    - ${{ inputs.thresholds }}
