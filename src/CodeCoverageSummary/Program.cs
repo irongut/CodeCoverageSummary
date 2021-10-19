@@ -49,11 +49,15 @@ namespace CodeCoverageSummary
                                              {
                                                  fileExt = "txt";
                                                  output = GenerateTextOutput(summary, badgeUrl, o.Indicators);
+                                                 if (o.FailBelowThreshold)
+                                                     output += $"Minimum allowed line rate is {lowerThreshold * 100:N0}%{Environment.NewLine}";
                                              }
                                              else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "md";
                                                  output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators);
+                                                 if (o.FailBelowThreshold)
+                                                     output += $"{Environment.NewLine}_Minimum allowed line rate is `{lowerThreshold * 100:N0}%`_{Environment.NewLine}";
                                              }
                                              else
                                              {
@@ -79,6 +83,12 @@ namespace CodeCoverageSummary
                                              {
                                                  Console.WriteLine("Error: Unknown output type.");
                                                  return -2; // error
+                                             }
+
+                                             if (o.FailBelowThreshold && summary.LineRate < lowerThreshold)
+                                             {
+                                                 Console.WriteLine($"FAIL: Overall line rate below minimum threshold of {lowerThreshold * 100:N0}%.");
+                                                 return -2;
                                              }
 
                                              return 0; // success

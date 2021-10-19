@@ -13,6 +13,11 @@ namespace CodeCoverageSummary
 
         public bool Badge => BadgeString.Equals("true", StringComparison.OrdinalIgnoreCase);
 
+        [Option(longName: "fail", Required = false, HelpText = "Fail if overall Line Rate below lower threshold - true or false.", Default = "false")]
+        public string FailString { get; set; }
+
+        public bool FailBelowThreshold => FailString.Equals("true", StringComparison.OrdinalIgnoreCase);
+
         [Option(longName: "format", Required = false, HelpText = "Output Format - markdown or text.", Default = "text")]
         public string Format { get; set; }
 
@@ -24,7 +29,7 @@ namespace CodeCoverageSummary
         [Option(longName: "output", Required = false, HelpText = "Output Type - console, file or both.", Default = "console")]
         public string Output { get; set; }
 
-        [Option(longName: "thresholds", Required = false, HelpText = "Badge and health indicator threshold percentages.", Default = "50 75")]
+        [Option(longName: "thresholds", Required = false, HelpText = "Threshold percentages for badge and health indicators, lower threshold can also be used to fail the action.", Default = "50 75")]
         public string Thresholds { get; set; }
     }
 }
