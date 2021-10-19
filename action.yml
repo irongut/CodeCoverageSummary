@@ -12,6 +12,10 @@ inputs:
     description: 'Include a Line Rate coverage badge in the output using shields.io - true / false (default).'
     required: false
     default: 'false'
+  fail_below_min:
+    description: 'Fail if overall Line Rate below lower threshold - true / false (default).'
+    required: false
+    default: 'false'
   format:
     description: 'Output Format - markdown or text (default).'
     required: false
@@ -25,7 +29,7 @@ inputs:
     required: false
     default: 'console'
   thresholds:
-    description: 'Badge and health indicator threshold percentages, default '50 75'.'
+    description: 'Threshold percentages for badge and health indicators, lower threshold can also be used to fail the action.'
     required: false
     default: '50 75'
 runs:
@@ -35,6 +39,8 @@ runs:
     - ${{ inputs.filename }}
     - '--badge'
     - ${{ inputs.badge }}
+    - '--fail'
+    - ${{ inputs.fail_below_min }}
     - '--format'
     - ${{ inputs.format }}
     - '--indicators'
