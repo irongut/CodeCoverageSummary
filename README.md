@@ -19,7 +19,13 @@ Note: Coverlet creates the coverage file in a random named directory (guid) so y
 
 Include a badge reporting the Line Rate coverage in the output using [shields.io](https://shields.io/) - `true` or `false` (default).
 
-If the overall Line Rate is less than the lower threshold (50%) the badge will be red, if it is between thresholds it will be yellow and if it greater than or equal to the higher threshold (75%) it will be green. See [`thresholds`](#thresholds) to change these values.
+Line Rate | Badge
+--------- | ---------
+less than lower threshold (50%) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-45%25-critical?style=flat)
+between thresholds (50% - 74%) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-65%25-yellow?style=flat)
+equal or greater than upper threshold (75%) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-83%25-success?style=flat)
+
+See [`thresholds`](#thresholds) to change these values.
 
 #### `fail_below_min`
 **v1.1.0-beta only**
@@ -33,7 +39,7 @@ Output Format - `markdown` or `text` (default).
 #### `indicators`
 **v1.1.0-beta only**
 
-Include health indicators in the output - `true` (default) or `false`.'
+Include health indicators in the output - `true` (default) or `false`.
 
 Line Rate | Indicator
 --------- | ---------
