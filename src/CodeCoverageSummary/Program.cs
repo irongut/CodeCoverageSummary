@@ -9,6 +9,9 @@ namespace CodeCoverageSummary
 {
     internal static class Program
     {
+        private static double lowerThreshold = 0.5;
+        private static double upperThreshold = 0.75;
+
         private static int Main(string[] args)
         {
             return Parser.Default.ParseArguments<CommandLineOptions>(args)
@@ -32,6 +35,10 @@ namespace CodeCoverageSummary
                                          }
                                          else
                                          {
+                                             // set health badge thresholds
+                                             if (!string.IsNullOrWhiteSpace(o.Thresholds))
+                                                 SetThresholds(o.Thresholds);
+
                                              // generate badge
                                              string badgeUrl = o.Badge ? GenerateBadge(summary) : null;
 
@@ -41,12 +48,16 @@ namespace CodeCoverageSummary
                                              if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "txt";
-                                                 output = GenerateTextOutput(summary, badgeUrl);
+                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators);
+                                                 if (o.FailBelowThreshold)
+                                                     output += $"Minimum allowed line rate is {lowerThreshold * 100:N0}%{Environment.NewLine}";
                                              }
                                              else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "md";
-                                                 output = GenerateMarkdownOutput(summary, badgeUrl);
+                                                 output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators);
+                                                 if (o.FailBelowThreshold)
+                                                     output += $"{Environment.NewLine}_Minimum allowed line rate is `{lowerThreshold * 100:N0}%`_{Environment.NewLine}";
                                              }
                                              else
                                              {
@@ -72,6 +83,12 @@ namespace CodeCoverageSummary
                                              {
                                                  Console.WriteLine("Error: Unknown output type.");
                                                  return -2; // error
+                                             }
+
+                                             if (o.FailBelowThreshold && summary.LineRate < lowerThreshold)
+                                             {
+                                                 Console.WriteLine($"FAIL: Overall line rate below minimum threshold of {lowerThreshold * 100:N0}%.");
+                                                 return -2;
                                              }
 
                                              return 0; // success
@@ -158,14 +175,49 @@ namespace CodeCoverageSummary
             }
         }
 
+        private static void SetThresholds(string thresholds)
+        {
+            int lowerPercentage;
+            int upperPercentage = (int)(upperThreshold * 100);
+            int s = thresholds.IndexOf(" ");
+            if (s == 0)
+            {
+                throw new ArgumentException("Threshold parameter set incorrectly.");
+            }
+            else if (s < 0)
+            {
+                if (!int.TryParse(thresholds, out lowerPercentage))
+                    throw new ArgumentException("Threshold parameter set incorrectly.");
+            }
+            else
+            {
+                if (!int.TryParse(thresholds.Substring(0, s), out lowerPercentage))
+                    throw new ArgumentException("Threshold parameter set incorrectly.");
+
+                if (!int.TryParse(thresholds.Substring(s + 1), out upperPercentage))
+                    throw new ArgumentException("Threshold parameter set incorrectly.");
+            }
+            lowerThreshold = lowerPercentage / 100.0;
+            upperThreshold = upperPercentage / 100.0;
+
+            if (lowerThreshold > 1.0)
+                lowerThreshold = 1.0;
+
+            if (lowerThreshold > upperThreshold)
+                upperThreshold = lowerThreshold + 0.1;
+
+            if (upperThreshold > 1.0)
+                upperThreshold = 1.0;
+        }
+
         private static string GenerateBadge(CodeSummary summary)
         {
             string colour;
-            if (summary.LineRate < 0.5)
+            if (summary.LineRate < lowerThreshold)
             {
                 colour = "critical";
             }
-            else if (summary.LineRate < 0.75)
+            else if (summary.LineRate < upperThreshold)
             {
                 colour = "yellow";
             }
@@ -176,78 +228,75 @@ namespace CodeCoverageSummary
             return $"https://img.shields.io/badge/Code%20Coverage-{summary.LineRate * 100:N0}%25-{colour}?style=flat";
         }
 
-        private static string GenerateTextOutput(CodeSummary summary, string badgeUrl)
+        private static string GenerateHealthIndicator(double rate)
+        {
+            if (rate < lowerThreshold)
+            {
+                return "❌";
+            }
+            else if (rate < upperThreshold)
+            {
+                return "➖";
+            }
+            else
+            {
+                return "✔";
+            }
+        }
+
+        private static string GenerateTextOutput(CodeSummary summary, string badgeUrl, bool indicators)
         {
             StringBuilder textOutput = new();
 
             if (!string.IsNullOrWhiteSpace(badgeUrl))
             {
-                textOutput.AppendLine(badgeUrl);
-            }
-
-            textOutput.AppendLine($"Line Rate = {summary.LineRate * 100:N0}%, Lines Covered = {summary.LinesCovered} / {summary.LinesValid}")
-                      .AppendLine($"Branch Rate = {summary.BranchRate * 100:N0}%, Branches Covered = {summary.BranchesCovered} / {summary.BranchesValid}");
-
-            if (summary.Complexity % 1 == 0)
-            {
-                textOutput.AppendLine($"Complexity = {summary.Complexity}");
-            }
-            else
-            {
-                textOutput.AppendLine($"Complexity = {summary.Complexity:N4}");
+                textOutput.AppendLine(badgeUrl)
+                          .AppendLine();
             }
 
             foreach (CodeCoverage package in summary.Packages)
             {
-                if (package.Complexity % 1 == 0)
-                {
-                    textOutput.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity}");
-                }
-                else
-                {
-                    textOutput.AppendLine($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%, Branch Rate = {package.BranchRate * 100:N0}%, Complexity = {package.Complexity:N4}");
-                }
+                textOutput.Append($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%")
+                          .Append($", Branch Rate = {package.BranchRate * 100:N0}%")
+                          .Append((package.Complexity % 1 == 0) ? $", Complexity = {package.Complexity}" : $", Complexity = {package.Complexity:N4}")
+                          .AppendLine(indicators ? $", {GenerateHealthIndicator(package.LineRate)}" : string.Empty);
             }
+
+            textOutput.Append($"Summary: Line Rate = {summary.LineRate * 100:N0}% ({summary.LinesCovered} / {summary.LinesValid})")
+                      .Append($", Branch Rate = {summary.BranchRate * 100:N0}% ({summary.BranchesCovered} / {summary.BranchesValid})")
+                      .Append((summary.Complexity % 1 == 0) ? $", Complexity = {summary.Complexity}" : $", Complexity = {summary.Complexity:N4}")
+                      .AppendLine(indicators ? $", {GenerateHealthIndicator(summary.LineRate)}" : string.Empty);
 
             return textOutput.ToString();
         }
 
-        private static string GenerateMarkdownOutput(CodeSummary summary, string badgeUrl)
+        private static string GenerateMarkdownOutput(CodeSummary summary, string badgeUrl, bool indicators)
         {
             StringBuilder markdownOutput = new();
 
             if (!string.IsNullOrWhiteSpace(badgeUrl))
             {
-                markdownOutput.AppendLine($"![Code Coverage]({badgeUrl})");
-                markdownOutput.AppendLine("");
+                markdownOutput.AppendLine($"![Code Coverage]({badgeUrl})")
+                              .AppendLine();
             }
 
-            markdownOutput.AppendLine("Package | Line Rate | Branch Rate | Complexity")
-                          .AppendLine("-------- | --------- | ----------- | ----------");
+            markdownOutput.Append("Package | Line Rate | Branch Rate | Complexity")
+                          .AppendLine(indicators ? " | Health" : string.Empty)
+                          .Append("-------- | --------- | ----------- | ----------")
+                          .AppendLine(indicators ? " | ------" : string.Empty);
 
             foreach (CodeCoverage package in summary.Packages)
             {
-                if (package.Complexity % 1 == 0)
-                {
-                    markdownOutput.AppendLine($"{package.Name} | {package.LineRate * 100:N0}% | {package.BranchRate * 100:N0}% | {package.Complexity}");
-                }
-                else
-                {
-                    markdownOutput.AppendLine($"{package.Name} | {package.LineRate * 100:N0}% | {package.BranchRate * 100:N0}% | {package.Complexity:N4}");
-                }
+                markdownOutput.Append($"{package.Name} | {package.LineRate * 100:N0}%")
+                              .Append($" | {package.BranchRate * 100:N0}%")
+                              .Append((package.Complexity % 1 == 0) ? $" | {package.Complexity}" : $" | {package.Complexity:N4}" )
+                              .AppendLine(indicators ? $" | {GenerateHealthIndicator(package.LineRate)}" : string.Empty);
             }
 
-            markdownOutput.Append($"**Summary** | **{summary.LineRate * 100:N0}%** ({summary.LinesCovered} / {summary.LinesValid}) | ")
-                          .Append($"**{summary.BranchRate * 100:N0}%** ({summary.BranchesCovered} / {summary.BranchesValid}) | ");
-
-            if (summary.Complexity % 1 == 0)
-            {
-                markdownOutput.AppendLine(summary.Complexity.ToString());
-            }
-            else
-            {
-                markdownOutput.AppendLine(summary.Complexity.ToString("N4"));
-            }
+            markdownOutput.Append($"**Summary** | **{summary.LineRate * 100:N0}%** ({summary.LinesCovered} / {summary.LinesValid})")
+                          .Append($" | **{summary.BranchRate * 100:N0}%** ({summary.BranchesCovered} / {summary.BranchesValid})")
+                          .Append((summary.Complexity % 1 == 0) ? $" | {summary.Complexity}" : $" | {summary.Complexity:N4}")
+                          .AppendLine(indicators ? $" | {GenerateHealthIndicator(summary.LineRate)}" : string.Empty);
 
             return markdownOutput.ToString();
         }

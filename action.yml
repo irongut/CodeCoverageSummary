@@ -9,17 +9,29 @@ inputs:
     description: 'Code coverage file to analyse.'
     required: true
   badge:
-    description: 'Include a badge in the output - true / false (default).'
+    description: 'Include a Line Rate coverage badge in the output using shields.io - true / false (default).'
+    required: false
+    default: 'false'
+  fail_below_min:
+    description: 'Fail if overall Line Rate below lower threshold - true / false (default).'
     required: false
     default: 'false'
   format:
     description: 'Output Format - markdown or text (default).'
     required: false
     default: 'text'
+  indicators:
+    description: 'Include health indicators in the output - true (default) / false.'
+    required: false
+    default: 'true'
   output:
     description: 'Output Type - console (default), file or both.'
     required: false
     default: 'console'
+  thresholds:
+    description: 'Threshold percentages for badge and health indicators, lower threshold can also be used to fail the action.'
+    required: false
+    default: '50 75'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/irongut/codecoveragesummary:v1.0.5'
@@ -27,7 +39,13 @@ runs:
     - ${{ inputs.filename }}
     - '--badge'
     - ${{ inputs.badge }}
+    - '--fail'
+    - ${{ inputs.fail_below_min }}
     - '--format'
     - ${{ inputs.format }}
+    - '--indicators'
+    - ${{ inputs.indicators }}
     - '--output'
     - ${{ inputs.output }}
+    - '--thresholds'
+    - ${{ inputs.thresholds }}

@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Performance", "RCS1197:Optimize StringBuilder.Append/AppendLine call.", Scope = "type", Target = "~T:CodeCoverageSummary.Program")]
+[assembly: SuppressMessage("Style", "IDE0057:Use range operator", Scope = "member", Target = "~M:CodeCoverageSummary.Program.SetThresholds(System.String)")]
