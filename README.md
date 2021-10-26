@@ -4,7 +4,7 @@ A GitHub Action that reads Cobertura format code coverage files from your test s
 
 Code Coverage Summary is designed for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) and [gcovr](https://github.com/gcovr/gcovr) but it should work with any test framework that outputs coverage in Cobertura format.
 
-As a Docker based action Code Coverage Summary requires a Linux runner, see [Types of Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions). If you need to build with a Windows or MacOS runner a workaround would be to upload the coverage file as an artifact and use a seperate job with a Linux runner to generate the summary.
+As a Docker based action Code Coverage Summary requires a Linux runner, see [Types of Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions). If you need to build with a Windows or MacOS runner a workaround would be to upload the coverage file as an artifact and use a separate job with a Linux runner to generate the summary.
 
 ## Inputs
 
@@ -19,11 +19,29 @@ Note: Coverlet creates the coverage file in a random named directory (guid) so y
 
 Include a badge reporting the Line Rate coverage in the output using [shields.io](https://shields.io/) - `true` or `false` (default).
 
-If the overall Line Rate is less than 50% the badge will be red, if it is 50% - 74% it will be yellow and if it is 75% or over it will be green. 
+If the overall Line Rate is less than the lower threshold (50%) the badge will be red, if it is between thresholds it will be yellow and if it greater than or equal to the higher threshold (75%) it will be green. See [`thresholds`](#thresholds) to change these values.
+
+#### `fail_below_min`
+**v1.1.0-beta only**
+
+Fail the workflow if the overall Line Rate is below lower threshold - `true` or `false` (default). The default lower threshold is 50%, see [`thresholds`](#thresholds).
 
 #### `format`
 
 Output Format - `markdown` or `text` (default).
+
+#### `indicators`
+**v1.1.0-beta only**
+
+Include health indicators in the output - `true` (default) or `false`.'
+
+Line Rate | Indicator
+--------- | ---------
+less than lower threshold (50%) | ❌
+between thresholds (50% - 74%) | ➖
+equal or greater than upper threshold (75%) | ✔
+
+See [`thresholds`](#thresholds) to change these values.
 
 #### `output`
 
@@ -35,16 +53,21 @@ Output Type - `console` (default), `file` or `both`.
 
 `both` will output the coverage summary to the Action log and a file as above.
 
+#### `thresholds`
+**v1.1.0-beta only**
+
+Lower and upper threshold percentages for badge and health indicators, lower threshold can also be used to fail the action. Separate the values with a space and enclose them in quotes; default `'50 75'`.
+
 ## Outputs
 
 #### Text Example
 ```
-https://img.shields.io/badge/Code%20Coverage-77%25-success?style=flat
-Line Rate = 77%, Lines Covered = 1107 / 1433
-Branch Rate = 60%, Branches Covered = 321 / 532
-Complexity = 917
-Company.Example: Line Rate = 78%, Branch Rate = 60%, Complexity = 906
-Company.Example.Library: Line Rate = 27%, Branch Rate = 100%, Complexity = 11
+https://img.shields.io/badge/Code%20Coverage-83%25-success?style=flat
+
+Company.Example: Line Rate = 83%, Branch Rate = 69%, Complexity = 671, ✔
+Company.Example.Library: Line Rate = 27%, Branch Rate = 100%, Complexity = 11, ❌
+Summary: Line Rate = 83% (1212 / 1460), Branch Rate = 69% (262 / 378), Complexity = 682, ✔
+Minimum allowed line rate is 50%
 ```
 
 #### Markdown Example
