@@ -8,36 +8,34 @@ As a Docker based action Code Coverage Summary requires a Linux runner, see [Typ
 
 ## Inputs
 
-#### `filename`
+### `filename`
 **Required**
 
 Code coverage file to analyse.
 
 Note: Coverlet creates the coverage file in a random named directory (guid) so you need to copy it to a predictable path before running this Action, see the [.Net 5 Workflow Example](#net-5-workflow-example) below.
 
-#### `badge`
+### `badge`
 
 Include a badge reporting the Line Rate coverage in the output using [shields.io](https://shields.io/) - `true` or `false` (default).
 
 Line Rate | Badge
---------- | ---------
+--------- | -----
 less than lower threshold (50%) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-45%25-critical?style=flat)
 between thresholds (50% - 74%) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-65%25-yellow?style=flat)
 equal or greater than upper threshold (75%) | ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-83%25-success?style=flat)
 
 See [`thresholds`](#thresholds) to change these values.
 
-#### `fail_below_min`
-**v1.1.0-beta only**
+### `fail_below_min`
 
 Fail the workflow if the overall Line Rate is below lower threshold - `true` or `false` (default). The default lower threshold is 50%, see [`thresholds`](#thresholds).
 
-#### `format`
+### `format`
 
 Output Format - `markdown` or `text` (default).
 
-#### `indicators`
-**v1.1.0-beta only**
+### `indicators`
 
 Include health indicators in the output - `true` (default) or `false`.
 
@@ -49,7 +47,7 @@ equal or greater than upper threshold (75%) | ✔
 
 See [`thresholds`](#thresholds) to change these values.
 
-#### `output`
+### `output`
 
 Output Type - `console` (default), `file` or `both`.
 
@@ -59,14 +57,13 @@ Output Type - `console` (default), `file` or `both`.
 
 `both` will output the coverage summary to the Action log and a file as above.
 
-#### `thresholds`
-**v1.1.0-beta only**
+### `thresholds`
 
 Lower and upper threshold percentages for badge and health indicators, lower threshold can also be used to fail the action. Separate the values with a space and enclose them in quotes; default `'50 75'`.
 
 ## Outputs
 
-#### Text Example
+### Text Example
 ```
 https://img.shields.io/badge/Code%20Coverage-83%25-success?style=flat
 
@@ -76,14 +73,14 @@ Summary: Line Rate = 83% (1212 / 1460), Branch Rate = 69% (262 / 378), Complexit
 Minimum allowed line rate is 50%
 ```
 
-#### Markdown Example
+### Markdown Example
 ![image](https://user-images.githubusercontent.com/27953302/117726304-4ac1c100-b1de-11eb-8d9a-6286ba1f5523.png)
 
 ## Usage
 
 ```yaml
 name: Code Coverage Summary Report
-uses: irongut/CodeCoverageSummary@v1.0.5
+uses: irongut/CodeCoverageSummary@v1.1.0
 with:
   filename: coverage/coverage.cobertura.xml
 ```
@@ -125,12 +122,14 @@ jobs:
       run: cp coverage/**/coverage.cobertura.xml coverage/coverage.cobertura.xml
 
     - name: Code Coverage Summary Report
-      uses: irongut/CodeCoverageSummary@v1.0.5
+      uses: irongut/CodeCoverageSummary@v1.1.0
       with:
         filename: coverage/coverage.cobertura.xml
         badge: true
+        fail_below_min: true
         format: 'markdown'
         output: 'both'
+        thresholds: '70 80'
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
