@@ -21,6 +21,16 @@ namespace CodeCoverageSummary
         [Option(longName: "format", Required = false, HelpText = "Output Format - markdown or text.", Default = "text")]
         public string Format { get; set; }
 
+        [Option(longName: "hidebranch", Required = false, HelpText = "Hide Branch Rate values in the output - true or false.", Default = "false")]
+        public string HideBranchString { get; set; }
+
+        public bool HideBranchRate => HideBranchString.Equals("true", StringComparison.OrdinalIgnoreCase);
+
+        [Option(longName: "hidecomplexity", Required = false, HelpText = "Hide Complexity values in the output - true or false.", Default = "false")]
+        public string HideComplexityString { get; set; }
+
+        public bool HideComplexity => HideComplexityString.Equals("true", StringComparison.OrdinalIgnoreCase);
+
         [Option(longName: "indicators", Required = false, HelpText = "Include health indicators in the output - true or false.", Default = "true")]
         public string IndicatorsString { get; set; }
 
