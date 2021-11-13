@@ -48,7 +48,7 @@ namespace CodeCoverageSummary
                                              if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "txt";
-                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators);
+                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators, o.HideBranchRate, o.HideComplexity);
                                                  if (o.FailBelowThreshold)
                                                      output += $"Minimum allowed line rate is {lowerThreshold * 100:N0}%{Environment.NewLine}";
                                              }
@@ -244,7 +244,7 @@ namespace CodeCoverageSummary
             }
         }
 
-        private static string GenerateTextOutput(CodeSummary summary, string badgeUrl, bool indicators)
+        private static string GenerateTextOutput(CodeSummary summary, string badgeUrl, bool indicators, bool hideBranchRate, bool hideComplexity)
         {
             StringBuilder textOutput = new();
 
@@ -256,16 +256,16 @@ namespace CodeCoverageSummary
 
             foreach (CodeCoverage package in summary.Packages)
             {
-                textOutput.Append($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%")
-                          .Append($", Branch Rate = {package.BranchRate * 100:N0}%")
-                          .Append((package.Complexity % 1 == 0) ? $", Complexity = {package.Complexity}" : $", Complexity = {package.Complexity:N4}")
-                          .AppendLine(indicators ? $", {GenerateHealthIndicator(package.LineRate)}" : string.Empty);
+                textOutput.Append($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%");
+                textOutput.Append(hideBranchRate ? string.Empty : $", Branch Rate = {package.BranchRate * 100:N0}%");
+                textOutput.Append(hideComplexity ? string.Empty : (package.Complexity % 1 == 0) ? $", Complexity = {package.Complexity}" : $", Complexity = {package.Complexity:N4}");
+                textOutput.AppendLine(indicators ? $", {GenerateHealthIndicator(package.LineRate)}" : string.Empty);
             }
 
-            textOutput.Append($"Summary: Line Rate = {summary.LineRate * 100:N0}% ({summary.LinesCovered} / {summary.LinesValid})")
-                      .Append($", Branch Rate = {summary.BranchRate * 100:N0}% ({summary.BranchesCovered} / {summary.BranchesValid})")
-                      .Append((summary.Complexity % 1 == 0) ? $", Complexity = {summary.Complexity}" : $", Complexity = {summary.Complexity:N4}")
-                      .AppendLine(indicators ? $", {GenerateHealthIndicator(summary.LineRate)}" : string.Empty);
+            textOutput.Append($"Summary: Line Rate = {summary.LineRate * 100:N0}% ({summary.LinesCovered} / {summary.LinesValid})");
+            textOutput.Append(hideBranchRate ? string.Empty : $", Branch Rate = {summary.BranchRate * 100:N0}% ({summary.BranchesCovered} / {summary.BranchesValid})");
+            textOutput.Append(hideComplexity ? string.Empty : (summary.Complexity % 1 == 0) ? $", Complexity = {summary.Complexity}" : $", Complexity = {summary.Complexity:N4}");
+            textOutput.AppendLine(indicators ? $", {GenerateHealthIndicator(summary.LineRate)}" : string.Empty);
 
             return textOutput.ToString();
         }
