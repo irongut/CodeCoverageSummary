@@ -299,7 +299,7 @@ namespace CodeCoverageSummary
 
             markdownOutput.Append($"**Summary** | **{summary.LineRate * 100:N0}%** ({summary.LinesCovered} / {summary.LinesValid})")
                           .Append(hideBranchRate ? string.Empty : $" | **{summary.BranchRate * 100:N0}%** ({summary.BranchesCovered} / {summary.BranchesValid})")
-                          .Append(hideComplexity ? string.Empty : (summary.Complexity % 1 == 0) ? $" | {summary.Complexity}" : $" | {summary.Complexity:N4}")
+                          .Append(hideComplexity ? string.Empty : (summary.Complexity % 1 == 0) ? $" | **{summary.Complexity}**" : $" | **{summary.Complexity:N4}**")
                           .AppendLine(indicators ? $" | {GenerateHealthIndicator(summary.LineRate)}" : string.Empty);
 
             return markdownOutput.ToString();
