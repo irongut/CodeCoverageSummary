@@ -20,6 +20,14 @@ inputs:
     description: 'Output Format - markdown or text (default).'
     required: false
     default: 'text'
+  hide_branch_rate:
+    description: 'Hide Branch Rate values in the output - true / false (default).'
+    required: false
+    default: 'false'
+  hide_complexity:
+    description: 'Hide Complexity values in the output - true / false (default).'
+    required: false
+    default: 'false'
   indicators:
     description: 'Include health indicators in the output - true (default) / false.'
     required: false
@@ -43,6 +51,10 @@ runs:
     - ${{ inputs.fail_below_min }}
     - '--format'
     - ${{ inputs.format }}
+    - '--hidebranch'
+    - ${{ inputs.hide_branch_rate }}
+    - '--hidecomplexity'
+    - ${{ inputs.hide_complexity }}
     - '--indicators'
     - ${{ inputs.indicators }}
     - '--output'

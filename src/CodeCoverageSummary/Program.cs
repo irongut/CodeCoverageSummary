@@ -48,14 +48,14 @@ namespace CodeCoverageSummary
                                              if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "txt";
-                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators);
+                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators, o.HideBranchRate, o.HideComplexity);
                                                  if (o.FailBelowThreshold)
                                                      output += $"Minimum allowed line rate is {lowerThreshold * 100:N0}%{Environment.NewLine}";
                                              }
                                              else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "md";
-                                                 output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators);
+                                                 output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators, o.HideBranchRate, o.HideComplexity);
                                                  if (o.FailBelowThreshold)
                                                      output += $"{Environment.NewLine}_Minimum allowed line rate is `{lowerThreshold * 100:N0}%`_{Environment.NewLine}";
                                              }
@@ -244,7 +244,7 @@ namespace CodeCoverageSummary
             }
         }
 
-        private static string GenerateTextOutput(CodeSummary summary, string badgeUrl, bool indicators)
+        private static string GenerateTextOutput(CodeSummary summary, string badgeUrl, bool indicators, bool hideBranchRate, bool hideComplexity)
         {
             StringBuilder textOutput = new();
 
@@ -257,20 +257,20 @@ namespace CodeCoverageSummary
             foreach (CodeCoverage package in summary.Packages)
             {
                 textOutput.Append($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%")
-                          .Append($", Branch Rate = {package.BranchRate * 100:N0}%")
-                          .Append((package.Complexity % 1 == 0) ? $", Complexity = {package.Complexity}" : $", Complexity = {package.Complexity:N4}")
+                          .Append(hideBranchRate ? string.Empty : $", Branch Rate = {package.BranchRate * 100:N0}%")
+                          .Append(hideComplexity ? string.Empty : (package.Complexity % 1 == 0) ? $", Complexity = {package.Complexity}" : $", Complexity = {package.Complexity:N4}")
                           .AppendLine(indicators ? $", {GenerateHealthIndicator(package.LineRate)}" : string.Empty);
             }
 
             textOutput.Append($"Summary: Line Rate = {summary.LineRate * 100:N0}% ({summary.LinesCovered} / {summary.LinesValid})")
-                      .Append($", Branch Rate = {summary.BranchRate * 100:N0}% ({summary.BranchesCovered} / {summary.BranchesValid})")
-                      .Append((summary.Complexity % 1 == 0) ? $", Complexity = {summary.Complexity}" : $", Complexity = {summary.Complexity:N4}")
+                      .Append(hideBranchRate ? string.Empty : $", Branch Rate = {summary.BranchRate * 100:N0}% ({summary.BranchesCovered} / {summary.BranchesValid})")
+                      .Append(hideComplexity ? string.Empty : (summary.Complexity % 1 == 0) ? $", Complexity = {summary.Complexity}" : $", Complexity = {summary.Complexity:N4}")
                       .AppendLine(indicators ? $", {GenerateHealthIndicator(summary.LineRate)}" : string.Empty);
 
             return textOutput.ToString();
         }
 
-        private static string GenerateMarkdownOutput(CodeSummary summary, string badgeUrl, bool indicators)
+        private static string GenerateMarkdownOutput(CodeSummary summary, string badgeUrl, bool indicators, bool hideBranchRate, bool hideComplexity)
         {
             StringBuilder markdownOutput = new();
 
@@ -280,22 +280,26 @@ namespace CodeCoverageSummary
                               .AppendLine();
             }
 
-            markdownOutput.Append("Package | Line Rate | Branch Rate | Complexity")
+            markdownOutput.Append("Package | Line Rate")
+                          .Append(hideBranchRate ? string.Empty : " | Branch Rate")
+                          .Append(hideComplexity ? string.Empty : " | Complexity")
                           .AppendLine(indicators ? " | Health" : string.Empty)
-                          .Append("-------- | --------- | ----------- | ----------")
+                          .Append("-------- | ---------")
+                          .Append(hideBranchRate ? string.Empty : " | -----------")
+                          .Append(hideComplexity ? string.Empty : " | ----------")
                           .AppendLine(indicators ? " | ------" : string.Empty);
 
             foreach (CodeCoverage package in summary.Packages)
             {
                 markdownOutput.Append($"{package.Name} | {package.LineRate * 100:N0}%")
-                              .Append($" | {package.BranchRate * 100:N0}%")
-                              .Append((package.Complexity % 1 == 0) ? $" | {package.Complexity}" : $" | {package.Complexity:N4}" )
+                              .Append(hideBranchRate ? string.Empty : $" | {package.BranchRate * 100:N0}%")
+                              .Append(hideComplexity ? string.Empty : (package.Complexity % 1 == 0) ? $" | {package.Complexity}" : $" | {package.Complexity:N4}" )
                               .AppendLine(indicators ? $" | {GenerateHealthIndicator(package.LineRate)}" : string.Empty);
             }
 
             markdownOutput.Append($"**Summary** | **{summary.LineRate * 100:N0}%** ({summary.LinesCovered} / {summary.LinesValid})")
-                          .Append($" | **{summary.BranchRate * 100:N0}%** ({summary.BranchesCovered} / {summary.BranchesValid})")
-                          .Append((summary.Complexity % 1 == 0) ? $" | {summary.Complexity}" : $" | {summary.Complexity:N4}")
+                          .Append(hideBranchRate ? string.Empty : $" | **{summary.BranchRate * 100:N0}%** ({summary.BranchesCovered} / {summary.BranchesValid})")
+                          .Append(hideComplexity ? string.Empty : (summary.Complexity % 1 == 0) ? $" | **{summary.Complexity}**" : $" | **{summary.Complexity:N4}**")
                           .AppendLine(indicators ? $" | {GenerateHealthIndicator(summary.LineRate)}" : string.Empty);
 
             return markdownOutput.ToString();
