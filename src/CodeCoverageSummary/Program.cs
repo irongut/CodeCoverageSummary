@@ -19,18 +19,29 @@ namespace CodeCoverageSummary
                                  {
                                      try
                                      {
-                                         if (!File.Exists(o.Filename))
+                                         // check files exist
+                                         foreach (var file in o.Files)
                                          {
-                                             Console.WriteLine("Error: Code coverage file not found.");
-                                             return -2; // error
+                                             if (!File.Exists(file))
+                                             {
+                                                 Console.WriteLine($"Error: Code coverage file not found - {file}.");
+                                                 return -2; // error
+                                             }
                                          }
 
                                          // parse code coverage file
-                                         Console.WriteLine($"Code Coverage File: {o.Filename}");
-                                         CodeSummary summary = ParseTestResults(o.Filename);
-                                         if (summary == null)
+                                         CodeSummary summary = new();
+                                         foreach (var file in o.Files)
                                          {
-                                             Console.WriteLine("Error: Parsing code coverage file.");
+                                             Console.WriteLine($"Code Coverage File: {file}");
+                                             summary = ParseTestResults(file, summary);
+                                         }
+                                         summary.LineRate /= o.Files.Count();
+                                         summary.BranchRate /= o.Files.Count();
+
+                                         if (summary.Packages.Count == 0)
+                                         {
+                                             Console.WriteLine("Error: Parsing code coverage file, no packages found.");
                                              return -2; // error
                                          }
                                          else
@@ -103,9 +114,9 @@ namespace CodeCoverageSummary
                                  _ => -1); // invalid arguments
         }
 
-        private static CodeSummary ParseTestResults(string filename)
+        private static CodeSummary ParseTestResults(string filename, CodeSummary summary)
         {
-            CodeSummary summary = new();
+            //CodeSummary summary = new();
             try
             {
                 string rss = File.ReadAllText(filename);
@@ -118,34 +129,32 @@ namespace CodeCoverageSummary
                 var lineR = from item in coverage.Attributes()
                             where item.Name == "line-rate"
                             select item;
-                summary.LineRate = double.Parse(lineR.First().Value);
+                summary.LineRate += double.Parse(lineR.First().Value);
 
                 var linesCovered = from item in coverage.Attributes()
                                    where item.Name == "lines-covered"
                                    select item;
-                summary.LinesCovered = int.Parse(linesCovered.First().Value);
+                summary.LinesCovered += int.Parse(linesCovered.First().Value);
 
                 var linesValid = from item in coverage.Attributes()
                                  where item.Name == "lines-valid"
                                  select item;
-                summary.LinesValid = int.Parse(linesValid.First().Value);
+                summary.LinesValid += int.Parse(linesValid.First().Value);
 
                 var branchR = from item in coverage.Attributes()
                               where item.Name == "branch-rate"
                               select item;
-                summary.BranchRate = double.Parse(branchR.First().Value);
+                summary.BranchRate += double.Parse(branchR.First().Value);
 
                 var branchesCovered = from item in coverage.Attributes()
                                       where item.Name == "branches-covered"
                                       select item;
-                summary.BranchesCovered = int.Parse(branchesCovered.First().Value);
+                summary.BranchesCovered += int.Parse(branchesCovered.First().Value);
 
                 var branchesValid = from item in coverage.Attributes()
                                     where item.Name == "branches-valid"
                                     select item;
-                summary.BranchesValid = int.Parse(branchesValid.First().Value);
-
-                summary.Complexity = 0;
+                summary.BranchesValid += int.Parse(branchesValid.First().Value);
 
                 // test coverage for individual packages
                 var packages = from item in coverage.Descendants("package")
