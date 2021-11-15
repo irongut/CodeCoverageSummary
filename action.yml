@@ -6,7 +6,7 @@ branding:
   color: purple
 inputs:
   filename:
-    description: 'Code coverage file to analyse.'
+    description: 'A comma separated list of code coverage files to analyse.'
     required: true
   badge:
     description: 'Include a Line Rate coverage badge in the output using shields.io - true / false (default).'
@@ -44,6 +44,7 @@ runs:
   using: 'docker'
   image: 'docker://ghcr.io/irongut/codecoveragesummary:v1.1.0'
   args:
+    - '--files'
     - ${{ inputs.filename }}
     - '--badge'
     - ${{ inputs.badge }}

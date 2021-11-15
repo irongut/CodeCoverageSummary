@@ -31,9 +31,6 @@ namespace CodeCoverageSummary
 
         public List<CodeCoverage> Packages { get; set; }
 
-        public CodeSummary()
-        {
-            Packages = new List<CodeCoverage>();
-        }
+        public CodeSummary() => Packages = new();
     }
 }

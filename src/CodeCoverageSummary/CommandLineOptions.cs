@@ -1,12 +1,13 @@
 ﻿using CommandLine;
 using System;
+using System.Collections.Generic;
 
 namespace CodeCoverageSummary
 {
     public class CommandLineOptions
     {
-        [Value(index: 0, Required = true, HelpText = "Code coverage file to analyse.")]
-        public string Filename { get; set; }
+        [Option(longName: "files", Separator = ',', Required = true, HelpText = "A comma separated list of code coverage files to analyse.")]
+        public IEnumerable<string> Files { get; set; }
 
         [Option(longName: "badge", Required = false, HelpText = "Include a Line Rate coverage badge in the output using shields.io - true or false.", Default = "false")]
         public string BadgeString { get; set; }
