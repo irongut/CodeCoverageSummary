@@ -116,7 +116,6 @@ namespace CodeCoverageSummary
 
         private static CodeSummary ParseTestResults(string filename, CodeSummary summary)
         {
-            //CodeSummary summary = new();
             try
             {
                 string rss = File.ReadAllText(filename);
