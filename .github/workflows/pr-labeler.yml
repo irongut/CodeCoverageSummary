@@ -1,0 +1,16 @@
+# Applies labels to pull requests based on paths & files modified in the pull request.
+#
+# .github/labeler.yml contains the list of labels & files / folders to match, see:
+# https://github.com/actions/labeler/blob/master/README.md
+
+name: PR Labeler
+on: 
+  pull_request_target:
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/labeler@v3
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"

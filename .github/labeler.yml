@@ -1,0 +1,31 @@
+# Configuration for PR Labeller Action
+# See: https://github.com/actions/labeler/blob/master/README.md
+
+# Examples
+# Add 'label1' to PR if anything changes within 'example' folder or any subfolders
+# label1:
+#   - example/**/*
+
+# Add 'label2' to PR if any file changes within 'example2' folder
+# label2: example2/*
+
+Action:
+  - action.yml
+
+Docker:
+  - Dockerfile
+  - .dockerignore
+
+Options: 
+  - src/CodeCoverageSummary/CommandLineOptions.cs
+
+Parsing:
+  - src/CodeCoverageSummary/CodeSummary.cs
+  - src/CodeCoverageSummary/Program.cs
+
+Summary:
+  - src/CodeCoverageSummary/CodeSummary.cs
+  - src/CodeCoverageSummary/Program.cs
+
+DevOps:
+  - .github/**/*
