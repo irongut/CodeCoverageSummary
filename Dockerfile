@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
 COPY ["src/CodeCoverageSummary/CodeCoverageSummary.csproj", "CodeCoverageSummary/"]
 RUN dotnet restore CodeCoverageSummary/CodeCoverageSummary.csproj
@@ -18,7 +18,7 @@ LABEL com.github.actions.description="A GitHub Action that reads Cobertura forma
 LABEL com.github.actions.icon="book-open"
 LABEL com.github.actions.color="purple"
 
-FROM mcr.microsoft.com/dotnet/runtime:5.0 AS final
+FROM mcr.microsoft.com/dotnet/runtime:6.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 COPY --from=build /src/sample.coverage.xml .
