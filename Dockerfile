@@ -1,11 +1,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
+COPY ["src/coverage.cobertura.xml", "/publish/sample.coverage.xml"]
 WORKDIR /src
 COPY ["src/CodeCoverageSummary/CodeCoverageSummary.csproj", "CodeCoverageSummary/"]
 RUN dotnet restore CodeCoverageSummary/CodeCoverageSummary.csproj
 COPY ["src/CodeCoverageSummary", "CodeCoverageSummary/"]
-COPY ["src/coverage.cobertura.xml", "sample.coverage.xml"]
-RUN dotnet build CodeCoverageSummary/CodeCoverageSummary.csproj --configuration Release --no-restore --output /app/build
-RUN dotnet publish CodeCoverageSummary/CodeCoverageSummary.csproj --configuration Release --no-restore --output /app/publish
+RUN dotnet publish CodeCoverageSummary/CodeCoverageSummary.csproj --configuration Release --no-restore --output /publish
 
 # Label the container
 LABEL maintainer="Irongut <murray.dave@outlook.com>"
@@ -20,6 +19,6 @@ LABEL com.github.actions.color="purple"
 
 FROM mcr.microsoft.com/dotnet/runtime:6.0 AS final
 WORKDIR /app
-COPY --from=build /app/publish .
-COPY --from=build /src/sample.coverage.xml .
+COPY --from=build /publish .
+ENV DOTNET_EnableDiagnostics=0
 ENTRYPOINT ["dotnet", "/app/CodeCoverageSummary.dll"]
