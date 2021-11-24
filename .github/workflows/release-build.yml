@@ -21,7 +21,7 @@ jobs:
     - name: Setup .Net
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
 
     - name: Restore Dependencies
       run: dotnet restore src/CodeCoverageSummary.sln
@@ -30,7 +30,7 @@ jobs:
       run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore
 
     - name: Test with sample file
-      run: dotnet src/CodeCoverageSummary/bin/Release/net5.0/CodeCoverageSummary.dll src/coverage.cobertura.xml --badge true
+      run: dotnet src/CodeCoverageSummary/bin/Release/net6.0/CodeCoverageSummary.dll src/coverage.cobertura.xml --badge true
 
     - name: Get Previous Tag
       id: get_previous_tag

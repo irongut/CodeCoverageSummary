@@ -6,7 +6,7 @@
     },
     "Docker": {
       "commandName": "Docker",
-      "commandLineArgs": "/src/coverage.cobertura.xml --format=md --badge=true"
+      "commandLineArgs": "--files /app/sample.coverage.xml --format=text --badge=true"
     }
   }
 }
