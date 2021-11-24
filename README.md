@@ -1,10 +1,23 @@
 # Code Coverage Summary
 
+<div align="center">
+  
+[![CI Build](https://github.com/irongut/CodeCoverageSummary/actions/workflows/ci-build.yml/badge.svg)](https://github.com/irongut/CodeCoverageSummary/actions/workflows/ci-build.yml)
+&nbsp;
+[![GitHub](https://img.shields.io/badge/GitHub-irongut/CodeCoverageSummary-informational?style=flat&logo=github)](https://github.com/irongut/CodeCoverageSummary)
+&nbsp;
+![.NET 6.0](https://img.shields.io/badge/Version-.NET%206.0-informational?style=flat&logo=dotnet)
+&nbsp;
+![Built With Docker](https://img.shields.io/badge/Built_With-Docker-informational?style=flat&logo=docker)
+  
+</div>
+
 A GitHub Action that reads Cobertura format code coverage files from your test suite and outputs a text or markdown summary. This summary can be posted as a Pull Request comment or included in Release Notes by other actions to give you an immediate insight into the health of your code without using a third-party site.
 
-Code Coverage Summary is designed for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) and [gcovr](https://github.com/gcovr/gcovr) but it should work with any test framework that outputs coverage in Cobertura format.
+Code Coverage Summary is designed for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) and [gcovr](https://github.com/gcovr/gcovr) but it should work with any test framework that outputs coverage in Cobertura format. If it doesn't work with your tooling please [open an issue][new-issue] to discuss the problem.
 
 As a Docker based action Code Coverage Summary requires a Linux runner, see [Types of Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions). If you need to build with a Windows or MacOS runner a workaround would be to upload the coverage file as an artifact and use a separate job with a Linux runner to generate the summary.
+
 
 ## Inputs
 
@@ -13,7 +26,10 @@ As a Docker based action Code Coverage Summary requires a Linux runner, see [Typ
 
 Code coverage file to analyse.
 
+**v1.2.0-beta only:** A comma separated list of code coverage files to analyse.
+
 Note: Coverlet creates the coverage file in a random named directory (guid) so you need to copy it to a predictable path before running this Action, see the [.Net 5 Workflow Example](#net-5-workflow-example) below.
+
 
 ### `badge`
 
@@ -27,13 +43,28 @@ equal or greater than upper threshold (75%) | ![Code Coverage](https://img.shiel
 
 See [`thresholds`](#thresholds) to change these values.
 
+
 ### `fail_below_min`
 
 Fail the workflow if the overall Line Rate is below lower threshold - `true` or `false` (default). The default lower threshold is 50%, see [`thresholds`](#thresholds).
 
+
 ### `format`
 
 Output Format - `markdown` or `text` (default).
+
+
+### `hide_branch_rate`
+**v1.2.0-beta only**
+
+Hide Branch Rate values in the output - `true` or `false` (default).
+
+
+### `hide_complexity`
+**v1.2.0-beta only**
+
+Hide Complexity values in the output - `true` or `false` (default).
+
 
 ### `indicators`
 
@@ -47,6 +78,7 @@ equal or greater than upper threshold (75%) | ✔
 
 See [`thresholds`](#thresholds) to change these values.
 
+
 ### `output`
 
 Output Type - `console` (default), `file` or `both`.
@@ -57,9 +89,11 @@ Output Type - `console` (default), `file` or `both`.
 
 `both` will output the coverage summary to the Action log and a file as above.
 
+
 ### `thresholds`
 
 Lower and upper threshold percentages for badge and health indicators, lower threshold can also be used to fail the action. Separate the values with a space and enclose them in quotes; default `'50 75'`.
+
 
 ## Outputs
 
@@ -73,8 +107,17 @@ Summary: Line Rate = 83% (1212 / 1460), Branch Rate = 69% (262 / 378), Complexit
 Minimum allowed line rate is 50%
 ```
 
+
 ### Markdown Example
-![image](https://user-images.githubusercontent.com/27953302/117726304-4ac1c100-b1de-11eb-8d9a-6286ba1f5523.png)
+
+> ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-83%25-success?style=flat)
+> 
+> Package | Line Rate | Branch Rate | Complexity | Health
+> -------- | --------- | ----------- | ---------- | ------
+> Company.Example | 83% | 69% | 671 | ✔
+> Company.Example.Library | 27% | 100% | 11 | ❌
+> **Summary** | **83%** (1212 / 1460) | **69%** (262 / 378) | 682 | ✔
+
 
 ## Usage
 
@@ -84,6 +127,7 @@ uses: irongut/CodeCoverageSummary@v1.1.0
 with:
   filename: coverage/coverage.cobertura.xml
 ```
+
 
 ### .Net 5 Workflow Example
 
@@ -139,6 +183,7 @@ jobs:
         path: code-coverage-results.md
 ```
 
+
 ## Contributing
 
 ### Report Bugs
@@ -147,9 +192,11 @@ Please make sure the bug is not already reported by searching existing [issues].
 
 If you're unable to find an existing issue addressing the problem please [open a new one][new-issue]. Be sure to include a title and clear description, as much relevant information as possible, a workflow sample and any logs demonstrating the problem.
 
+
 ### Suggest an Enhancement
 
 Please [open a new issue][new-issue].
+
 
 ### Submit a Pull Request
 
@@ -158,6 +205,7 @@ Discuss your idea first, so that your changes have a good chance of being merged
 Submit your pull request against the `master` branch.
 
 Pull requests that include documentation and relevant updates to README.md are merged faster, because you won't have to wait for somebody else to complete your contribution.
+
 
 ## License
 
