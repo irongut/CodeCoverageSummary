@@ -24,11 +24,9 @@ As a Docker based action Code Coverage Summary requires a Linux runner, see [Typ
 ### `filename`
 **Required**
 
-Code coverage file to analyse.
+A comma separated list of code coverage files to analyse. If there are any spaces in a path or filename this value must be in quotes.
 
-**v1.2.0-beta only:** A comma separated list of code coverage files to analyse.
-
-Note: Coverlet creates the coverage file in a random named directory (guid) so you need to copy it to a predictable path before running this Action, see the [.Net 5 Workflow Example](#net-5-workflow-example) below.
+Note: Coverlet creates the coverage file in a random named directory (guid) so you need to copy it to a predictable path before running this Action, see the [.Net Workflow Example](#net-workflow-example) below.
 
 
 ### `badge`
@@ -55,13 +53,11 @@ Output Format - `markdown` or `text` (default).
 
 
 ### `hide_branch_rate`
-**v1.2.0-beta only**
 
 Hide Branch Rate values in the output - `true` or `false` (default).
 
 
 ### `hide_complexity`
-**v1.2.0-beta only**
 
 Hide Complexity values in the output - `true` or `false` (default).
 
@@ -117,22 +113,24 @@ Minimum allowed line rate is 50%
 > Company.Example | 83% | 69% | 671 | ✔
 > Company.Example.Library | 27% | 100% | 11 | ❌
 > **Summary** | **83%** (1212 / 1460) | **69%** (262 / 378) | 682 | ✔
+> 
+> _Minimum allowed line rate is `50%`_
 
 
 ## Usage
 
 ```yaml
 name: Code Coverage Summary Report
-uses: irongut/CodeCoverageSummary@v1.1.0
+uses: irongut/CodeCoverageSummary@v1.2.0
 with:
-  filename: coverage/coverage.cobertura.xml
+  filename: coverage.cobertura.xml
 ```
 
 
-### .Net 5 Workflow Example
+### .Net Workflow Example
 
 ```yaml
-name: .Net 5 CI Build
+name: .Net 6 CI Build
 
 on:
   push:
@@ -151,7 +149,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 5.0.x
+        dotnet-version: 6.0.x
 
     - name: Restore Dependencies
       run: dotnet restore src/Example.sln
@@ -163,17 +161,20 @@ jobs:
       run: dotnet test src/Example.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
 
     - name: Copy Coverage To Predictable Location
-      run: cp coverage/**/coverage.cobertura.xml coverage/coverage.cobertura.xml
+      run: cp coverage/**/coverage.cobertura.xml coverage.cobertura.xml
 
     - name: Code Coverage Summary Report
-      uses: irongut/CodeCoverageSummary@v1.1.0
+      uses: irongut/CodeCoverageSummary@v1.2.0
       with:
-        filename: coverage/coverage.cobertura.xml
+        filename: coverage.cobertura.xml
         badge: true
         fail_below_min: true
-        format: 'markdown'
-        output: 'both'
-        thresholds: '70 80'
+        format: markdown
+        hide_branch_rate: false
+        hide_complexity: true
+        indicators: true
+        output: both
+        thresholds: '60 80'
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2

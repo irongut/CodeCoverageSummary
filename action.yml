@@ -42,7 +42,7 @@ inputs:
     default: '50 75'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/irongut/codecoveragesummary:v1.2.0-beta'
+  image: 'docker://ghcr.io/irongut/codecoveragesummary:v1.2.0'
   args:
     - '--files'
     - ${{ inputs.filename }}
