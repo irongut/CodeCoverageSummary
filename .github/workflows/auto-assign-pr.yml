@@ -2,7 +2,10 @@
 # https://github.com/samspills/assign-pr-to-author
 
 name: Auto Assign PR
-on: [pull_request]
+
+on:
+  pull_request:
+    types: [opened]
 
 jobs:
   assignAuthor:
@@ -10,6 +13,5 @@ jobs:
     steps:
     - name: Auto Assign PR
       uses: samspills/assign-pr-to-author@v1.0.1
-      if: github.event_name == 'pull_request' && github.event.action == 'opened'
       with:
         repo-token: '${{ secrets.GITHUB_TOKEN }}'
