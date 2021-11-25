@@ -13,12 +13,12 @@ jobs:
     - name: Test Action
       uses: irongut/CodeCoverageSummary@master
       with:
-        filename: /app/sample.coverage.xml
+        filename: /app/sample.coverage.xml,/app/sample.coverage.xml
         badge: true
         fail_below_min: true
-        format: 'markdown'
+        format: markdown
         hide_branch_rate: false
         hide_complexity: true
         indicators: true
-        output: 'both'
+        output: both
         thresholds: '60 80'
