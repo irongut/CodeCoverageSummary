@@ -16,6 +16,8 @@ A GitHub Action that reads Cobertura format code coverage files from your test s
 
 Code Coverage Summary is designed for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) and [gcovr](https://github.com/gcovr/gcovr) but it should work with any test framework that outputs coverage in Cobertura format. If it doesn't work with your tooling please [open an issue][new-issue] to discuss the problem.
 
+If you're using [Simplecov](https://github.com/simplecov-ruby/simplecov) please see the [wiki](https://github.com/irongut/CodeCoverageSummary/wiki/Simplecov-Compatibility) for required settings to enable compatibility with Code Coverage Summary.
+
 As a Docker based action Code Coverage Summary requires a Linux runner, see [Types of Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions). If you need to build with a Windows or MacOS runner a workaround would be to upload the coverage file as an artifact and use a separate job with a Linux runner to generate the summary.
 
 
