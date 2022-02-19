@@ -187,6 +187,16 @@ jobs:
 ```
 
 
+## Version Numbers
+
+Version numbers will be assigned according to the [Semantic Versioning](https://semver.org/) scheme.
+This means, given a version number MAJOR.MINOR.PATCH, we will increment the:
+
+1. MAJOR version when we make incompatible API changes
+2. MINOR version when we add functionality in a backwards compatible manner
+3. PATCH version when we make backwards compatible bug fixes
+
+
 ## Contributing
 
 ### Report Bugs
