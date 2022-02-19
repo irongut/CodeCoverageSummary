@@ -26,4 +26,4 @@ jobs:
       run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore
 
     - name: Test with sample file
-      run: dotnet src/CodeCoverageSummary/bin/Release/net6.0/CodeCoverageSummary.dll --files src/coverage.cobertura.xml --badge true
+      run: dotnet src/CodeCoverageSummary/bin/Release/net6.0/CodeCoverageSummary.dll --files **/coverage.*.xml --badge true
