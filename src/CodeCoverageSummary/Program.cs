@@ -249,10 +249,10 @@ namespace CodeCoverageSummary
             }
             else
             {
-                if (!int.TryParse(thresholds.Substring(0, s), out lowerPercentage))
+                if (!int.TryParse(thresholds.AsSpan(0, s), out lowerPercentage))
                     throw new ArgumentException("Threshold parameter set incorrectly.");
 
-                if (!int.TryParse(thresholds.Substring(s + 1), out upperPercentage))
+                if (!int.TryParse(thresholds.AsSpan(s + 1), out upperPercentage))
                     throw new ArgumentException("Threshold parameter set incorrectly.");
             }
             lowerThreshold = lowerPercentage / 100.0;
