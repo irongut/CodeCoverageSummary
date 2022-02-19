@@ -1,5 +1,7 @@
 ﻿using CommandLine;
+using Microsoft.Extensions.FileSystemGlobbing;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,8 +21,13 @@ namespace CodeCoverageSummary
                                  {
                                      try
                                      {
+                                         // use glob patterns to match files
+                                         Matcher matcher = new();
+                                         matcher.AddIncludePatterns(o.Files.ToArray());
+                                         IEnumerable<string> matchingFiles = matcher.GetResultsInFullPath(".");
+
                                          // check files exist
-                                         foreach (var file in o.Files)
+                                         foreach (var file in matchingFiles)
                                          {
                                              if (!File.Exists(file))
                                              {
@@ -31,13 +38,13 @@ namespace CodeCoverageSummary
 
                                          // parse code coverage file
                                          CodeSummary summary = new();
-                                         foreach (var file in o.Files)
+                                         foreach (var file in matchingFiles)
                                          {
                                              Console.WriteLine($"Code Coverage File: {file}");
                                              summary = ParseTestResults(file, summary);
                                          }
-                                         summary.LineRate /= o.Files.Count();
-                                         summary.BranchRate /= o.Files.Count();
+                                         summary.LineRate /= matchingFiles.Count();
+                                         summary.BranchRate /= matchingFiles.Count();
 
                                          if (summary.Packages.Count == 0)
                                          {
