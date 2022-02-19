@@ -59,6 +59,11 @@ namespace CodeCoverageSummary
                                          }
                                          else
                                          {
+                                             // hide branch rate if metrics missing
+                                             bool hideBranchRate = o.HideBranchRate;
+                                             if (summary.BranchRate == 0 && summary.BranchesCovered == 0 && summary.BranchesValid == 0)
+                                                 hideBranchRate = true;
+
                                              // set health badge thresholds
                                              if (!string.IsNullOrWhiteSpace(o.Thresholds))
                                                  SetThresholds(o.Thresholds);
@@ -72,14 +77,14 @@ namespace CodeCoverageSummary
                                              if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "txt";
-                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators, o.HideBranchRate, o.HideComplexity);
+                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators, hideBranchRate, o.HideComplexity);
                                                  if (o.FailBelowThreshold)
                                                      output += $"Minimum allowed line rate is {lowerThreshold * 100:N0}%{Environment.NewLine}";
                                              }
                                              else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "md";
-                                                 output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators, o.HideBranchRate, o.HideComplexity);
+                                                 output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators, hideBranchRate, o.HideComplexity);
                                                  if (o.FailBelowThreshold)
                                                      output += $"{Environment.NewLine}_Minimum allowed line rate is `{lowerThreshold * 100:N0}%`_{Environment.NewLine}";
                                              }
@@ -156,17 +161,21 @@ namespace CodeCoverageSummary
                 var branchR = from item in coverage.Attributes()
                               where item.Name == "branch-rate"
                               select item;
-                summary.BranchRate += double.Parse(branchR.First().Value);
 
-                var branchesCovered = from item in coverage.Attributes()
-                                      where item.Name == "branches-covered"
-                                      select item;
-                summary.BranchesCovered += int.Parse(branchesCovered.First().Value);
+                if (branchR.Any())
+                {
+                    summary.BranchRate += double.Parse(branchR.First().Value);
 
-                var branchesValid = from item in coverage.Attributes()
-                                    where item.Name == "branches-valid"
-                                    select item;
-                summary.BranchesValid += int.Parse(branchesValid.First().Value);
+                    var branchesCovered = from item in coverage.Attributes()
+                                          where item.Name == "branches-covered"
+                                          select item;
+                    summary.BranchesCovered += int.Parse(branchesCovered.First().Value);
+
+                    var branchesValid = from item in coverage.Attributes()
+                                        where item.Name == "branches-valid"
+                                        select item;
+                    summary.BranchesValid += int.Parse(branchesValid.First().Value);
+                }
 
                 // test coverage for individual packages
                 var packages = from item in coverage.Descendants("package")
