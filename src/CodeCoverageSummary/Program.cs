@@ -217,7 +217,7 @@ namespace CodeCoverageSummary
                 {
                     CodeCoverage packageCoverage = new()
                     {
-                        Name = string.IsNullOrWhiteSpace(item.Attribute("name")?.Value) ? $"Package {i}" : item.Attribute("name").Value,
+                        Name = string.IsNullOrWhiteSpace(item.Attribute("name")?.Value) ? $"{Path.GetFileNameWithoutExtension(filename)} Package {i}" : item.Attribute("name").Value,
                         LineRate = double.Parse(item.Attribute("line-rate")?.Value ?? "0"),
                         BranchRate = double.Parse(item.Attribute("branch-rate")?.Value ?? "0"),
                         Complexity = double.Parse(item.Attribute("complexity")?.Value ?? "0")
