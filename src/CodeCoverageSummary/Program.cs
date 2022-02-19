@@ -37,7 +37,7 @@ namespace CodeCoverageSummary
                                          {
                                              if (!File.Exists(file))
                                              {
-                                                 Console.WriteLine($"Error: Code coverage file not found - {file}.");
+                                                 Console.WriteLine($"Error: Coverage file not found - {file}.");
                                                  return -2; // error
                                              }
                                          }
@@ -46,19 +46,28 @@ namespace CodeCoverageSummary
                                          CodeSummary summary = new();
                                          foreach (var file in matchingFiles)
                                          {
-                                             Console.WriteLine($"Code Coverage File: {file}");
+                                             Console.WriteLine($"Coverage File: {file}");
                                              summary = ParseTestResults(file, summary);
                                          }
+
+                                         if (summary == null)
+                                             return -2; // error
+
                                          summary.LineRate /= matchingFiles.Count();
                                          summary.BranchRate /= matchingFiles.Count();
 
                                          if (summary.Packages.Count == 0)
                                          {
-                                             Console.WriteLine("Error: Parsing code coverage file, no packages found.");
+                                             Console.WriteLine("Parsing Error: No packages found in coverage files.");
                                              return -2; // error
                                          }
                                          else
                                          {
+                                             // hide branch rate if metrics missing
+                                             bool hideBranchRate = o.HideBranchRate;
+                                             if (summary.BranchRate == 0 && summary.BranchesCovered == 0 && summary.BranchesValid == 0)
+                                                 hideBranchRate = true;
+
                                              // set health badge thresholds
                                              if (!string.IsNullOrWhiteSpace(o.Thresholds))
                                                  SetThresholds(o.Thresholds);
@@ -72,14 +81,14 @@ namespace CodeCoverageSummary
                                              if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "txt";
-                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators, o.HideBranchRate, o.HideComplexity);
+                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators, hideBranchRate, o.HideComplexity);
                                                  if (o.FailBelowThreshold)
                                                      output += $"Minimum allowed line rate is {lowerThreshold * 100:N0}%{Environment.NewLine}";
                                              }
                                              else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "md";
-                                                 output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators, o.HideBranchRate, o.HideComplexity);
+                                                 output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators, hideBranchRate, o.HideComplexity);
                                                  if (o.FailBelowThreshold)
                                                      output += $"{Environment.NewLine}_Minimum allowed line rate is `{lowerThreshold * 100:N0}%`_{Environment.NewLine}";
                                              }
@@ -92,6 +101,7 @@ namespace CodeCoverageSummary
                                              // output
                                              if (o.Output.Equals("console", StringComparison.OrdinalIgnoreCase))
                                              {
+                                                 Console.WriteLine();
                                                  Console.WriteLine(output);
                                              }
                                              else if (o.Output.Equals("file", StringComparison.OrdinalIgnoreCase))
@@ -100,6 +110,7 @@ namespace CodeCoverageSummary
                                              }
                                              else if (o.Output.Equals("both", StringComparison.OrdinalIgnoreCase))
                                              {
+                                                 Console.WriteLine();
                                                  Console.WriteLine(output);
                                                  File.WriteAllText($"code-coverage-results.{fileExt}", output);
                                              }
@@ -129,6 +140,9 @@ namespace CodeCoverageSummary
 
         private static CodeSummary ParseTestResults(string filename, CodeSummary summary)
         {
+            if (summary == null)
+                return null;
+
             try
             {
                 string rss = File.ReadAllText(filename);
@@ -138,46 +152,72 @@ namespace CodeCoverageSummary
                 var coverage = from item in xdoc.Descendants("coverage")
                                select item;
 
+                if (!coverage.Any())
+                    throw new Exception("Coverage file invalid, data not found");
+
                 var lineR = from item in coverage.Attributes()
                             where item.Name == "line-rate"
                             select item;
+
+                if (!lineR.Any())
+                    throw new Exception("Overall line rate not found");
+
                 summary.LineRate += double.Parse(lineR.First().Value);
 
                 var linesCovered = from item in coverage.Attributes()
                                    where item.Name == "lines-covered"
                                    select item;
+
+                if (!linesCovered.Any())
+                    throw new Exception("Overall lines covered not found");
+
                 summary.LinesCovered += int.Parse(linesCovered.First().Value);
 
                 var linesValid = from item in coverage.Attributes()
                                  where item.Name == "lines-valid"
                                  select item;
+
+                if (!linesValid.Any())
+                    throw new Exception("Overall lines valid not found");
+
                 summary.LinesValid += int.Parse(linesValid.First().Value);
 
                 var branchR = from item in coverage.Attributes()
                               where item.Name == "branch-rate"
                               select item;
-                summary.BranchRate += double.Parse(branchR.First().Value);
 
-                var branchesCovered = from item in coverage.Attributes()
-                                      where item.Name == "branches-covered"
-                                      select item;
-                summary.BranchesCovered += int.Parse(branchesCovered.First().Value);
+                if (branchR.Any())
+                {
+                    summary.BranchRate += double.Parse(branchR.First().Value);
 
-                var branchesValid = from item in coverage.Attributes()
-                                    where item.Name == "branches-valid"
-                                    select item;
-                summary.BranchesValid += int.Parse(branchesValid.First().Value);
+                    var branchesCovered = from item in coverage.Attributes()
+                                          where item.Name == "branches-covered"
+                                          select item;
+
+                    if (branchesCovered.Any())
+                        summary.BranchesCovered += int.Parse(branchesCovered.First().Value);
+
+                    var branchesValid = from item in coverage.Attributes()
+                                        where item.Name == "branches-valid"
+                                        select item;
+
+                    if (branchesValid.Any())
+                        summary.BranchesValid += int.Parse(branchesValid.First().Value);
+                }
 
                 // test coverage for individual packages
                 var packages = from item in coverage.Descendants("package")
                                select item;
+
+                if (!packages.Any())
+                    throw new Exception("No package data found");
 
                 int i = 1;
                 foreach (var item in packages)
                 {
                     CodeCoverage packageCoverage = new()
                     {
-                        Name = string.IsNullOrWhiteSpace(item.Attribute("name").Value) ? $"Package {i}" : item.Attribute("name").Value,
+                        Name = string.IsNullOrWhiteSpace(item.Attribute("name")?.Value) ? $"{Path.GetFileNameWithoutExtension(filename)} Package {i}" : item.Attribute("name").Value,
                         LineRate = double.Parse(item.Attribute("line-rate")?.Value ?? "0"),
                         BranchRate = double.Parse(item.Attribute("branch-rate")?.Value ?? "0"),
                         Complexity = double.Parse(item.Attribute("complexity")?.Value ?? "0")
@@ -191,7 +231,7 @@ namespace CodeCoverageSummary
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Parse Error: {ex.Message}");
+                Console.WriteLine($"Parsing Error: {ex.Message} - {filename}");
                 return null;
             }
         }
@@ -212,10 +252,10 @@ namespace CodeCoverageSummary
             }
             else
             {
-                if (!int.TryParse(thresholds.Substring(0, s), out lowerPercentage))
+                if (!int.TryParse(thresholds.AsSpan(0, s), out lowerPercentage))
                     throw new ArgumentException("Threshold parameter set incorrectly.");
 
-                if (!int.TryParse(thresholds.Substring(s + 1), out upperPercentage))
+                if (!int.TryParse(thresholds.AsSpan(s + 1), out upperPercentage))
                     throw new ArgumentException("Threshold parameter set incorrectly.");
             }
             lowerThreshold = lowerPercentage / 100.0;
