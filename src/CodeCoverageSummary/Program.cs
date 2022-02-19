@@ -26,6 +26,12 @@ namespace CodeCoverageSummary
                                          matcher.AddIncludePatterns(o.Files.ToArray());
                                          IEnumerable<string> matchingFiles = matcher.GetResultsInFullPath(".");
 
+                                         if (matchingFiles?.Any() == false)
+                                         {
+                                             Console.WriteLine("Error: No files found matching glob pattern.");
+                                             return -2; // error
+                                         }
+
                                          // check files exist
                                          foreach (var file in matchingFiles)
                                          {
