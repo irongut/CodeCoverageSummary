@@ -49,12 +49,16 @@ namespace CodeCoverageSummary
                                              Console.WriteLine($"Code Coverage File: {file}");
                                              summary = ParseTestResults(file, summary);
                                          }
+
+                                         if (summary == null)
+                                             return -2; // error
+
                                          summary.LineRate /= matchingFiles.Count();
                                          summary.BranchRate /= matchingFiles.Count();
 
                                          if (summary.Packages.Count == 0)
                                          {
-                                             Console.WriteLine("Error: Parsing code coverage file, no packages found.");
+                                             Console.WriteLine("Parsing Error: No packages found in coverage files.");
                                              return -2; // error
                                          }
                                          else
@@ -97,6 +101,7 @@ namespace CodeCoverageSummary
                                              // output
                                              if (o.Output.Equals("console", StringComparison.OrdinalIgnoreCase))
                                              {
+                                                 Console.WriteLine();
                                                  Console.WriteLine(output);
                                              }
                                              else if (o.Output.Equals("file", StringComparison.OrdinalIgnoreCase))
@@ -105,6 +110,7 @@ namespace CodeCoverageSummary
                                              }
                                              else if (o.Output.Equals("both", StringComparison.OrdinalIgnoreCase))
                                              {
+                                                 Console.WriteLine();
                                                  Console.WriteLine(output);
                                                  File.WriteAllText($"code-coverage-results.{fileExt}", output);
                                              }
@@ -134,6 +140,9 @@ namespace CodeCoverageSummary
 
         private static CodeSummary ParseTestResults(string filename, CodeSummary summary)
         {
+            if (summary == null)
+                return null;
+
             try
             {
                 string rss = File.ReadAllText(filename);
@@ -143,19 +152,34 @@ namespace CodeCoverageSummary
                 var coverage = from item in xdoc.Descendants("coverage")
                                select item;
 
+                if (!coverage.Any())
+                    throw new Exception("Coverage file invalid, data not found");
+
                 var lineR = from item in coverage.Attributes()
                             where item.Name == "line-rate"
                             select item;
+
+                if (!lineR.Any())
+                    throw new Exception("Summary Line Rate not found");
+
                 summary.LineRate += double.Parse(lineR.First().Value);
 
                 var linesCovered = from item in coverage.Attributes()
                                    where item.Name == "lines-covered"
                                    select item;
+
+                if (!linesCovered.Any())
+                    throw new Exception("Summary Lines Covered not found");
+
                 summary.LinesCovered += int.Parse(linesCovered.First().Value);
 
                 var linesValid = from item in coverage.Attributes()
                                  where item.Name == "lines-valid"
                                  select item;
+
+                if (!linesValid.Any())
+                    throw new Exception("Summary Lines Valid not found");
+
                 summary.LinesValid += int.Parse(linesValid.First().Value);
 
                 var branchR = from item in coverage.Attributes()
@@ -169,12 +193,16 @@ namespace CodeCoverageSummary
                     var branchesCovered = from item in coverage.Attributes()
                                           where item.Name == "branches-covered"
                                           select item;
-                    summary.BranchesCovered += int.Parse(branchesCovered.First().Value);
+
+                    if (branchesCovered.Any())
+                        summary.BranchesCovered += int.Parse(branchesCovered.First().Value);
 
                     var branchesValid = from item in coverage.Attributes()
                                         where item.Name == "branches-valid"
                                         select item;
-                    summary.BranchesValid += int.Parse(branchesValid.First().Value);
+
+                    if (branchesValid.Any())
+                        summary.BranchesValid += int.Parse(branchesValid.First().Value);
                 }
 
                 // test coverage for individual packages
@@ -186,7 +214,7 @@ namespace CodeCoverageSummary
                 {
                     CodeCoverage packageCoverage = new()
                     {
-                        Name = string.IsNullOrWhiteSpace(item.Attribute("name").Value) ? $"Package {i}" : item.Attribute("name").Value,
+                        Name = string.IsNullOrWhiteSpace(item.Attribute("name")?.Value) ? $"Package {i}" : item.Attribute("name").Value,
                         LineRate = double.Parse(item.Attribute("line-rate")?.Value ?? "0"),
                         BranchRate = double.Parse(item.Attribute("branch-rate")?.Value ?? "0"),
                         Complexity = double.Parse(item.Attribute("complexity")?.Value ?? "0")
@@ -200,7 +228,7 @@ namespace CodeCoverageSummary
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Parse Error: {ex.Message}");
+                Console.WriteLine($"Parsing Error: {ex.Message} - {filename}");
                 return null;
             }
         }
