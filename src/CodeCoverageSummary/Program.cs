@@ -37,7 +37,7 @@ namespace CodeCoverageSummary
                                          {
                                              if (!File.Exists(file))
                                              {
-                                                 Console.WriteLine($"Error: Code coverage file not found - {file}.");
+                                                 Console.WriteLine($"Error: Coverage file not found - {file}.");
                                                  return -2; // error
                                              }
                                          }
@@ -46,7 +46,7 @@ namespace CodeCoverageSummary
                                          CodeSummary summary = new();
                                          foreach (var file in matchingFiles)
                                          {
-                                             Console.WriteLine($"Code Coverage File: {file}");
+                                             Console.WriteLine($"Coverage File: {file}");
                                              summary = ParseTestResults(file, summary);
                                          }
 
@@ -160,7 +160,7 @@ namespace CodeCoverageSummary
                             select item;
 
                 if (!lineR.Any())
-                    throw new Exception("Summary Line Rate not found");
+                    throw new Exception("Overall line rate not found");
 
                 summary.LineRate += double.Parse(lineR.First().Value);
 
@@ -169,7 +169,7 @@ namespace CodeCoverageSummary
                                    select item;
 
                 if (!linesCovered.Any())
-                    throw new Exception("Summary Lines Covered not found");
+                    throw new Exception("Overall lines covered not found");
 
                 summary.LinesCovered += int.Parse(linesCovered.First().Value);
 
@@ -178,7 +178,7 @@ namespace CodeCoverageSummary
                                  select item;
 
                 if (!linesValid.Any())
-                    throw new Exception("Summary Lines Valid not found");
+                    throw new Exception("Overall lines valid not found");
 
                 summary.LinesValid += int.Parse(linesValid.First().Value);
 
@@ -208,6 +208,9 @@ namespace CodeCoverageSummary
                 // test coverage for individual packages
                 var packages = from item in coverage.Descendants("package")
                                select item;
+
+                if (!packages.Any())
+                    throw new Exception("No package data found");
 
                 int i = 1;
                 foreach (var item in packages)
