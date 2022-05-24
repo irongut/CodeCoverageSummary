@@ -40,6 +40,10 @@ inputs:
     description: 'Threshold percentages for badge and health indicators, lower threshold can also be used to fail the action.'
     required: false
     default: '50 75'
+  show_class_names:
+    description: 'Show individual class detail in the output - true / false (default)'
+    required: false
+    default: 'false'
 runs:
   using: 'docker'
   image: 'docker://ghcr.io/irongut/codecoveragesummary:v1.2.0'
@@ -62,3 +66,5 @@ runs:
     - ${{ inputs.output }}
     - '--thresholds'
     - ${{ inputs.thresholds }}
+    - '--showclassnames'
+    - ${{ inputs.show_class_names }}

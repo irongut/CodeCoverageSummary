@@ -47,7 +47,7 @@ namespace CodeCoverageSummary
                                          foreach (var file in matchingFiles)
                                          {
                                              Console.WriteLine($"Coverage File: {file}");
-                                             summary = ParseTestResults(file, summary);
+                                             summary = ParseTestResults(file, summary, o.ShowClassNames);
                                          }
 
                                          if (summary == null)
@@ -138,7 +138,7 @@ namespace CodeCoverageSummary
                                  _ => -1); // invalid arguments
         }
 
-        private static CodeSummary ParseTestResults(string filename, CodeSummary summary)
+        private static CodeSummary ParseTestResults(string filename, CodeSummary summary, bool showClassNames)
         {
             if (summary == null)
                 return null;
@@ -207,6 +207,10 @@ namespace CodeCoverageSummary
 
                 // test coverage for individual packages
                 var packages = from item in coverage.Descendants("package")
+                           select item;
+
+                if (!showClassNames)
+                    packages = from item in coverage.Descendants("package").Descendants("class")
                                select item;
 
                 if (!packages.Any())

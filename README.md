@@ -63,6 +63,9 @@ Hide Branch Rate values in the output - `true` or `false` (default).
 
 Hide Complexity values in the output - `true` or `false` (default).
 
+### `show_class_names`
+
+Show individual class detail in the output - `true` / `false` (default)
 
 ### `indicators`
 
