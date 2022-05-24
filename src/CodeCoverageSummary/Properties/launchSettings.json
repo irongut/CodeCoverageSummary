@@ -2,7 +2,7 @@
   "profiles": {
     "CodeCoverageSummary": {
       "commandName": "Project",
-      "commandLineArgs": "--files coverage.*.xml --format=md --badge true --thresholds=\"85 90\" --fail true --showclassnames true"
+      "commandLineArgs": "--files **/coverage.*.xml --format=text --badge true --thresholds=\"85 90\" --fail true"
     },
     "Docker": {
       "commandName": "Docker",
