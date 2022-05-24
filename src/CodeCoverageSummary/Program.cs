@@ -209,7 +209,7 @@ namespace CodeCoverageSummary
                 var packages = from item in coverage.Descendants("package")
                            select item;
 
-                if (!showClassNames)
+                if (showClassNames && packages.Any())
                     packages = from item in coverage.Descendants("package").Descendants("class")
                                select item;
 

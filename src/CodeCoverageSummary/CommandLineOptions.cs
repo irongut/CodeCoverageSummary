@@ -34,7 +34,7 @@ namespace CodeCoverageSummary
 
         [Option(longName: "showclassnames", Required = false, HelpText = "Show individual class detail in the output - true or false.", Default = "true")]
         public string ShowClassNamesString { get; set; }
-        public bool ShowClassNames => ShowClassNamesString.Equals("false", StringComparison.OrdinalIgnoreCase);
+        public bool ShowClassNames => ShowClassNamesString.Equals("true", StringComparison.OrdinalIgnoreCase);
 
         [Option(longName: "indicators", Required = false, HelpText = "Include health indicators in the output - true or false.", Default = "true")]
         public string IndicatorsString { get; set; }
