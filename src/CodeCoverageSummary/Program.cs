@@ -209,12 +209,15 @@ namespace CodeCoverageSummary
                 var packages = from item in coverage.Descendants("package")
                            select item;
 
+                if (!packages.Any())
+                    throw new Exception("No package data found");
+
                 if (showClassNames && packages.Any())
                     packages = from item in coverage.Descendants("package").Descendants("class")
                                select item;
 
                 if (!packages.Any())
-                    throw new Exception("No package data found");
+                    throw new Exception("No class data found");
 
                 int i = 1;
                 foreach (var item in packages)

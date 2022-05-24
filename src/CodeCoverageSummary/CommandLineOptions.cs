@@ -32,7 +32,7 @@ namespace CodeCoverageSummary
 
         public bool HideComplexity => HideComplexityString.Equals("true", StringComparison.OrdinalIgnoreCase);
 
-        [Option(longName: "showclassnames", Required = false, HelpText = "Show individual class detail in the output - true or false.", Default = "true")]
+        [Option(longName: "showclassnames", Required = false, HelpText = "Show individual class detail in the output - true or false.", Default = "false")]
         public string ShowClassNamesString { get; set; }
         public bool ShowClassNames => ShowClassNamesString.Equals("true", StringComparison.OrdinalIgnoreCase);
 
