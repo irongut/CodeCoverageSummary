@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 
+// Add random comment
 namespace CodeCoverageSummary
 {
     public class CodeCoverage
