@@ -7,8 +7,13 @@ on:
   pull_request:
     types: [opened]
 
+permissions:
+  contents: read
+
 jobs:
   assignAuthor:
+    permissions:
+      issues: write  # for samspills/assign-pr-to-author
     runs-on: ubuntu-latest
     steps:
 
