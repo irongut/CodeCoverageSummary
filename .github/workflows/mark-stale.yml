@@ -4,14 +4,25 @@ on:
   schedule:
   - cron: "30 1 * * *"
 
+permissions:
+  contents: read
+
 jobs:
   stale:
 
+    permissions:
+      issues: write  # for actions/stale to close stale issues
+      pull-requests: write  # for actions/stale to close stale PRs
     runs-on: ubuntu-latest
-
     steps:
+
+    - name: Harden Runner
+      uses: step-security/harden-runner@74b568e8591fbb3115c70f3436a0c6b0909a8504
+      with:
+        egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+
     - name: Mark Stale
-      uses: actions/stale@v3
+      uses: actions/stale@98ed4cb500039dbcccf4bd9bedada4d0187f2757
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         exempt-all-milestones: true
