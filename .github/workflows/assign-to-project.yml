@@ -8,34 +8,45 @@ on:
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+permissions:
+  contents: read
+
 jobs:
   assign-to-project:
+    permissions:
+      repository-projects: write  # for srggrs/assign-one-project-github-action to assign issues and PRs to repo project
     runs-on: ubuntu-latest
     name: Assign to Project
     steps:
+    
+    - name: Harden Runner
+      uses: step-security/harden-runner@74b568e8591fbb3115c70f3436a0c6b0909a8504
+      with:
+        egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+
     - name: Assign Issues to Bugs
-      uses: srggrs/assign-one-project-github-action@1.3.1
+      uses: srggrs/assign-one-project-github-action@4d59cc619499b55ca689fb13cfcc72324a8b8435
       if: contains(github.event.issue.labels.*.name, 'bug')
       with:
         project: 'https://github.com/irongut/CodeCoverageSummary/projects/1'
         column_name: 'Needs triage'
 
     - name: Assign Issues to Enhancements
-      uses: srggrs/assign-one-project-github-action@1.3.1
+      uses: srggrs/assign-one-project-github-action@4d59cc619499b55ca689fb13cfcc72324a8b8435
       if: contains(github.event.issue.labels.*.name, 'enhancement')
       with:
         project: 'https://github.com/irongut/CodeCoverageSummary/projects/2'
         column_name: 'To do'
 
     - name: Assign PRs to Bugs
-      uses: srggrs/assign-one-project-github-action@1.3.1
+      uses: srggrs/assign-one-project-github-action@4d59cc619499b55ca689fb13cfcc72324a8b8435
       if: contains(github.event.pull_request.labels.*.name, 'bug')
       with:
         project: 'https://github.com/irongut/CodeCoverageSummary/projects/1'
         column_name: 'In Progress'
 
     - name: Assign PRs to Enhancements
-      uses: srggrs/assign-one-project-github-action@1.3.1
+      uses: srggrs/assign-one-project-github-action@4d59cc619499b55ca689fb13cfcc72324a8b8435
       if: contains(github.event.pull_request.labels.*.name, 'enhancement')
       with:
         project: 'https://github.com/irongut/CodeCoverageSummary/projects/2'
