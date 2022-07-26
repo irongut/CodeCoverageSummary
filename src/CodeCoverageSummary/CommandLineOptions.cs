@@ -6,7 +6,7 @@ namespace CodeCoverageSummary
 {
     public class CommandLineOptions
     {
-        [Option(longName: "files", Separator = ',', Required = true, HelpText = "A comma separated list of code coverage files to analyse.")]
+        [Option(longName: "files", Separator = ',', Required = true, HelpText = "A comma separated list of code coverage files to analyse. Also accepts glob patterns.")]
         public IEnumerable<string> Files { get; set; }
 
         [Option(longName: "badge", Required = false, HelpText = "Include a Line Rate coverage badge in the output using shields.io - true or false.", Default = "false")]

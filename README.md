@@ -18,6 +18,8 @@ Code Coverage Summary is designed for use with [Coverlet](https://github.com/cov
 
 If you're using [Simplecov](https://github.com/simplecov-ruby/simplecov) please see the [wiki](https://github.com/irongut/CodeCoverageSummary/wiki/Simplecov-Compatibility) for required settings to enable compatibility with Code Coverage Summary.
 
+**v1.3.0-beta only:** Code Coverage Summary should now be compatible with simplecov using the default settings as well as MATLAB's code coverage plugin.
+
 As a Docker based action Code Coverage Summary requires a Linux runner, see [Types of Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions). If you need to build with a Windows or MacOS runner a workaround would be to upload the coverage file as an artifact and use a separate job with a Linux runner to generate the summary.
 
 
@@ -27,6 +29,8 @@ As a Docker based action Code Coverage Summary requires a Linux runner, see [Typ
 **Required**
 
 A comma separated list of code coverage files to analyse. If there are any spaces in a path or filename this value must be in quotes.
+
+**v1.3.0-beta only:** Also supports using glob patterns to match multiple files.
 
 Note: Coverlet creates the coverage file in a random named directory (guid) so you need to copy it to a predictable path before running this Action, see the [.Net Workflow Example](#net-workflow-example) below.
 
