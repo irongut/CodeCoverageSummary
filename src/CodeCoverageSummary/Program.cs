@@ -188,21 +188,19 @@ namespace CodeCoverageSummary
 
                 if (branchR.Any())
                 {
-                    summary.BranchRate += double.Parse(branchR.First().Value);
+                    summary.BranchRate += double.TryParse(branchR.First().Value, out double bRate) ? bRate : 0;
 
                     var branchesCovered = from item in coverage.Attributes()
                                           where item.Name == "branches-covered"
                                           select item;
 
-                    if (branchesCovered.Any())
-                        summary.BranchesCovered += int.Parse(branchesCovered.First().Value);
+                    summary.BranchesCovered += int.TryParse(branchesCovered?.First().Value ?? "0", out int bCovered) ? bCovered : 0;
 
                     var branchesValid = from item in coverage.Attributes()
                                         where item.Name == "branches-valid"
                                         select item;
 
-                    if (branchesValid.Any())
-                        summary.BranchesValid += int.Parse(branchesValid.First().Value);
+                    summary.BranchesValid += int.TryParse(branchesValid?.First().Value ?? "0", out int bValid) ? bValid : 0;
                 }
 
                 // test coverage for individual packages
@@ -219,8 +217,8 @@ namespace CodeCoverageSummary
                     {
                         Name = string.IsNullOrWhiteSpace(item.Attribute("name")?.Value) ? $"{Path.GetFileNameWithoutExtension(filename)} Package {i}" : item.Attribute("name").Value,
                         LineRate = double.Parse(item.Attribute("line-rate")?.Value ?? "0"),
-                        BranchRate = double.Parse(item.Attribute("branch-rate")?.Value ?? "0"),
-                        Complexity = double.Parse(item.Attribute("complexity")?.Value ?? "0")
+                        BranchRate = double.TryParse(item.Attribute("branch-rate")?.Value ?? "0", out double bRate) ? bRate : 0,
+                        Complexity = double.TryParse(item.Attribute("complexity")?.Value ?? "0", out double complex) ? complex : 0
                     };
                     summary.Packages.Add(packageCoverage);
                     summary.Complexity += packageCoverage.Complexity;
