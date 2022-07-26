@@ -10,10 +10,14 @@ jobs:
     runs-on: ubuntu-latest
     name: CI Build
     steps:
+    
+    - name: Checkout
+      uses: actions/checkout@v2
+      
     - name: Test Action
       uses: irongut/CodeCoverageSummary@master
       with:
-        filename: /app/sample.coverage.xml,/app/sample.coverage.xml
+        filename: /src/coverage.*.xml
         badge: true
         fail_below_min: true
         format: markdown
