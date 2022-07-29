@@ -6,6 +6,8 @@ namespace CodeCoverageSummary
     {
         public string Name { get; set; }
 
+        public string FileName { get; set; }
+
         public double LineRate { get; set; }
 
         public double BranchRate { get; set; }

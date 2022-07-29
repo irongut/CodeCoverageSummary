@@ -63,6 +63,9 @@ Hide Branch Rate metrics in the output - `true` or `false` (default).
 
 Hide Complexity metrics in the output - `true` or `false` (default).
 
+### `show_class_names`
+
+Show individual class detail in the output - `true` / `false` (default)
 
 ### `indicators`
 

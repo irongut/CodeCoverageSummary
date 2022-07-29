@@ -47,7 +47,7 @@ namespace CodeCoverageSummary
                                          foreach (var file in matchingFiles)
                                          {
                                              Console.WriteLine($"Coverage File: {file}");
-                                             summary = ParseTestResults(file, summary);
+                                             summary = ParseTestResults(file, summary, o.ShowClassNames);
                                          }
 
                                          if (summary == null)
@@ -81,14 +81,14 @@ namespace CodeCoverageSummary
                                              if (o.Format.Equals("text", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "txt";
-                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators, hideBranchRate, o.HideComplexity);
+                                                 output = GenerateTextOutput(summary, badgeUrl, o.Indicators, hideBranchRate, o.HideComplexity, o.ShowClassNames);
                                                  if (o.FailBelowThreshold)
                                                      output += $"Minimum allowed line rate is {lowerThreshold * 100:N0}%{Environment.NewLine}";
                                              }
                                              else if (o.Format.Equals("md", StringComparison.OrdinalIgnoreCase) || o.Format.Equals("markdown", StringComparison.OrdinalIgnoreCase))
                                              {
                                                  fileExt = "md";
-                                                 output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators, hideBranchRate, o.HideComplexity);
+                                                 output = GenerateMarkdownOutput(summary, badgeUrl, o.Indicators, hideBranchRate, o.HideComplexity, o.ShowClassNames);
                                                  if (o.FailBelowThreshold)
                                                      output += $"{Environment.NewLine}_Minimum allowed line rate is `{lowerThreshold * 100:N0}%`_{Environment.NewLine}";
                                              }
@@ -138,7 +138,7 @@ namespace CodeCoverageSummary
                                  _ => -1); // invalid arguments
         }
 
-        private static CodeSummary ParseTestResults(string filename, CodeSummary summary)
+        private static CodeSummary ParseTestResults(string filename, CodeSummary summary, bool showClassNames)
         {
             if (summary == null)
                 return null;
@@ -205,10 +205,17 @@ namespace CodeCoverageSummary
 
                 // test coverage for individual packages
                 var packages = from item in coverage.Descendants("package")
-                               select item;
+                           select item;
 
                 if (!packages.Any())
                     throw new Exception("No package data found");
+
+                if (showClassNames && packages.Any())
+                    packages = from item in coverage.Descendants("package").Descendants("class")
+                               select item;
+
+                if (!packages.Any())
+                    throw new Exception("No class data found");
 
                 int i = 1;
                 foreach (var item in packages)
@@ -216,6 +223,7 @@ namespace CodeCoverageSummary
                     CodeCoverage packageCoverage = new()
                     {
                         Name = string.IsNullOrWhiteSpace(item.Attribute("name")?.Value) ? $"{Path.GetFileNameWithoutExtension(filename)} Package {i}" : item.Attribute("name").Value,
+                        FileName = string.IsNullOrWhiteSpace(item.Attribute("filename")?.Value) ? "N/A" : item.Attribute("filename").Value,
                         LineRate = double.Parse(item.Attribute("line-rate")?.Value ?? "0"),
                         BranchRate = double.TryParse(item.Attribute("branch-rate")?.Value ?? "0", out double bRate) ? bRate : 0,
                         Complexity = double.TryParse(item.Attribute("complexity")?.Value ?? "0", out double complex) ? complex : 0
@@ -303,7 +311,7 @@ namespace CodeCoverageSummary
             }
         }
 
-        private static string GenerateTextOutput(CodeSummary summary, string badgeUrl, bool indicators, bool hideBranchRate, bool hideComplexity)
+        private static string GenerateTextOutput(CodeSummary summary, string badgeUrl, bool indicators, bool hideBranchRate, bool hideComplexity, bool showClassName)
         {
             StringBuilder textOutput = new();
 
@@ -315,7 +323,9 @@ namespace CodeCoverageSummary
 
             foreach (CodeCoverage package in summary.Packages)
             {
-                textOutput.Append($"{package.Name}: Line Rate = {package.LineRate * 100:N0}%")
+                textOutput.Append($"{package.Name} : ")
+                          .Append(showClassName ? $"{package.FileName}: " : string.Empty)
+                          .Append("Line Rate = {package.LineRate * 100:N0}%")
                           .Append(hideBranchRate ? string.Empty : $", Branch Rate = {package.BranchRate * 100:N0}%")
                           .Append(hideComplexity ? string.Empty : (package.Complexity % 1 == 0) ? $", Complexity = {package.Complexity}" : $", Complexity = {package.Complexity:N4}")
                           .AppendLine(indicators ? $", {GenerateHealthIndicator(package.LineRate)}" : string.Empty);
@@ -329,7 +339,7 @@ namespace CodeCoverageSummary
             return textOutput.ToString();
         }
 
-        private static string GenerateMarkdownOutput(CodeSummary summary, string badgeUrl, bool indicators, bool hideBranchRate, bool hideComplexity)
+        private static string GenerateMarkdownOutput(CodeSummary summary, string badgeUrl, bool indicators, bool hideBranchRate, bool hideComplexity, bool showClassNames)
         {
             StringBuilder markdownOutput = new();
 
@@ -339,18 +349,24 @@ namespace CodeCoverageSummary
                               .AppendLine();
             }
 
-            markdownOutput.Append("Package | Line Rate")
+            markdownOutput.Append("Package ")
+                          .Append(showClassNames ? " | Class " : string.Empty)
+                          .Append("| Line Rate")
                           .Append(hideBranchRate ? string.Empty : " | Branch Rate")
                           .Append(hideComplexity ? string.Empty : " | Complexity")
                           .AppendLine(indicators ? " | Health" : string.Empty)
-                          .Append("-------- | ---------")
-                          .Append(hideBranchRate ? string.Empty : " | -----------")
+                          .Append("| ----------")
+                          .Append(showClassNames ? " | ---------" : string.Empty)
+                          .Append("| --------- ")
+                          .Append(hideBranchRate ? string.Empty : " | ----------")
                           .Append(hideComplexity ? string.Empty : " | ----------")
                           .AppendLine(indicators ? " | ------" : string.Empty);
 
             foreach (CodeCoverage package in summary.Packages)
             {
-                markdownOutput.Append($"{package.Name} | {package.LineRate * 100:N0}%")
+                markdownOutput.Append($"{package.Name}")
+                              .Append(showClassNames ? $" | {package.FileName}" : string.Empty)
+                              .Append($" | {package.LineRate * 100:N0}%")
                               .Append(hideBranchRate ? string.Empty : $" | {package.BranchRate * 100:N0}%")
                               .Append(hideComplexity ? string.Empty : (package.Complexity % 1 == 0) ? $" | {package.Complexity}" : $" | {package.Complexity:N4}" )
                               .AppendLine(indicators ? $" | {GenerateHealthIndicator(package.LineRate)}" : string.Empty);
