@@ -14,11 +14,9 @@
 
 A GitHub Action that reads Cobertura format code coverage files from your test suite and outputs a text or markdown summary. This summary can be posted as a Pull Request comment or included in Release Notes by other actions to give you an immediate insight into the health of your code without using a third-party site.
 
-Code Coverage Summary is designed for use with [Coverlet](https://github.com/coverlet-coverage/coverlet) and [gcovr](https://github.com/gcovr/gcovr) but it should work with any test framework that outputs coverage in Cobertura format. If it doesn't work with your tooling please [open an issue][new-issue] to discuss the problem.
+Code Coverage Summary is designed for use with any test framework that outputs coverage in Cobertura XML format including [Coverlet](https://github.com/coverlet-coverage/coverlet), [gcovr](https://github.com/gcovr/gcovr), [simplecov](https://github.com/simplecov-ruby/simplecov) and [MATLAB](https://uk.mathworks.com/help/matlab/ref/matlab.unittest.plugins.codecoverageplugin-class.html). See the [FAQ](https://github.com/irongut/CodeCoverageSummary/wiki/Frequently-Asked-Questions#which-testing-tools-does-ccs-work-with) for more details. If it doesn't work with your tooling please [open an issue][new-issue] to discuss the problem.
 
-If you're using [Simplecov](https://github.com/simplecov-ruby/simplecov) please see the [wiki](https://github.com/irongut/CodeCoverageSummary/wiki/Simplecov-Compatibility) for required settings to enable compatibility with Code Coverage Summary.
-
-**v1.3.0-beta only:** Code Coverage Summary should now be compatible with simplecov using the default settings as well as MATLAB's code coverage plugin.
+Code Coverage Summary is compatible with [StepSecurity Secure Workflows](https://github.com/step-security/secure-workflows) and uses a Docker image that is cryptographically signed using [Sigstore](https://www.sigstore.dev/). For instructions how to verify the Docker image please see the [Wiki](https://github.com/irongut/CodeCoverageSummary/wiki/Verify-the-Docker-Image).
 
 As a Docker based action Code Coverage Summary requires a Linux runner, see [Types of Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions). If you need to build with a Windows or MacOS runner a workaround would be to upload the coverage file as an artifact and use a separate job with a Linux runner to generate the summary.
 
@@ -28,9 +26,7 @@ As a Docker based action Code Coverage Summary requires a Linux runner, see [Typ
 ### `filename`
 **Required**
 
-A comma separated list of code coverage files to analyse. If there are any spaces in a path or filename this value must be in quotes.
-
-**v1.3.0-beta only:** Also supports using glob patterns to match multiple files.
+A comma separated list of code coverage files to analyse. Also supports using glob patterns to match multiple files. If there are any spaces in a path or filename this value must be in quotes.
 
 Note: Coverlet creates the coverage file in a random named directory (guid) so you need to copy it to a predictable path before running this Action, see the [.Net Workflow Example](#net-workflow-example) below.
 
@@ -60,12 +56,12 @@ Output Format - `markdown` or `text` (default).
 
 ### `hide_branch_rate`
 
-Hide Branch Rate values in the output - `true` or `false` (default).
+Hide Branch Rate metrics in the output - `true` or `false` (default).
 
 
 ### `hide_complexity`
 
-Hide Complexity values in the output - `true` or `false` (default).
+Hide Complexity metrics in the output - `true` or `false` (default).
 
 
 ### `indicators`
@@ -127,7 +123,7 @@ Minimum allowed line rate is 50%
 
 ```yaml
 name: Code Coverage Summary Report
-uses: irongut/CodeCoverageSummary@v1.2.0
+uses: irongut/CodeCoverageSummary@v1.3.0
 with:
   filename: coverage.cobertura.xml
 ```
@@ -170,7 +166,7 @@ jobs:
       run: cp coverage/**/coverage.cobertura.xml coverage.cobertura.xml
 
     - name: Code Coverage Summary Report
-      uses: irongut/CodeCoverageSummary@v1.2.0
+      uses: irongut/CodeCoverageSummary@v1.3.0
       with:
         filename: coverage.cobertura.xml
         badge: true
