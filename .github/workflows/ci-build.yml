@@ -34,5 +34,5 @@ jobs:
     - name: Build CodeCoverageSummary
       run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore
 
-    - name: Test with sample file
+    - name: Test with sample files
       run: dotnet src/CodeCoverageSummary/bin/Release/net6.0/CodeCoverageSummary.dll --files **/coverage.*.xml --badge true
