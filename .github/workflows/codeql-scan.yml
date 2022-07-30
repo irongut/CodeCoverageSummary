@@ -54,7 +54,7 @@ jobs:
       run: dotnet restore src/CodeCoverageSummary.sln
 
     - name: Build CodeCoverageSummary
-      run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore
+      run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore /p:UseSharedCompilation=false
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@74e8f231851deb9b54c3e408f88638dd39727868
