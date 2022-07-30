@@ -4,10 +4,10 @@
 
 Version | Supported         
 ------- | ------------------
-1.2.0 | :white_check_mark:
-1.2.0-beta | :x:
+1.3.0 | :white_check_mark:
+1.3.0-beta | :x:
+1.2.0 | :x:
 1.1.0 | :x:
-1.1.0-beta| :x:
 1.0.x | :x:
 
 Only the latest version is supported. If you find a security vulnerability in an eariler version please check it exists in the latest version before reporting.
