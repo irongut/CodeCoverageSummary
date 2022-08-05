@@ -9,6 +9,11 @@ on:
 permissions:
   contents: read
 
+env:
+  DOTNET_NOLOGO: true                     # Disable the .NET logo in the console output
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true # Disable the .NET first time experience to skip caching NuGet packages and speed up the build
+  DOTNET_CLI_TELEMETRY_OPTOUT: true       # Disable sending .NET CLI telemetry to Microsoft
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -18,7 +23,13 @@ jobs:
     - name: Harden Runner
       uses: step-security/harden-runner@74b568e8591fbb3115c70f3436a0c6b0909a8504
       with:
-        egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+        egress-policy: block
+        allowed-endpoints: >
+          api.nuget.org:443
+          dotnetbuilds.azureedge.net:443
+          dotnetcli.azureedge.net:443
+          dotnetcli.blob.core.windows.net:443
+          github.com:443
 
     - name: Checkout
       uses: actions/checkout@d171c3b028d844f2bf14e9fdec0c58114451e4bf
