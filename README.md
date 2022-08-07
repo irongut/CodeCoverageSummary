@@ -20,7 +20,7 @@ Code Coverage Summary is designed for use with any test framework that outputs c
 
 Code Coverage Summary is compatible with [StepSecurity Secure Workflows](https://github.com/step-security/secure-workflows) and uses a Docker image that is cryptographically signed using [Sigstore](https://www.sigstore.dev/). For instructions how to verify the Docker image please see the [Wiki](https://github.com/irongut/CodeCoverageSummary/wiki/Verify-the-Docker-Image).
 
-As a Docker based action Code Coverage Summary requires a Linux runner, see [Types of Action](https://docs.github.com/en/actions/creating-actions/about-custom-actions#types-of-actions). If you need to build with a Windows or MacOS runner a workaround would be to upload the coverage file as an artifact and use a separate job with a Linux runner to generate the summary.
+**As a Docker based action Code Coverage Summary requires a Linux runner.**
 
 
 ## Inputs
@@ -29,8 +29,6 @@ As a Docker based action Code Coverage Summary requires a Linux runner, see [Typ
 **Required**
 
 A comma separated list of code coverage files to analyse. Also supports using glob patterns to match multiple files. If there are any spaces in a path or filename this value must be in quotes.
-
-Note: Coverlet creates the coverage file in a random named directory (guid) so you need to copy it to a predictable path before running this Action, see the [.Net Workflow Example](#net-workflow-example) below.
 
 
 ### `badge`
@@ -164,13 +162,10 @@ jobs:
     - name: Test
       run: dotnet test src/Example.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
 
-    - name: Copy Coverage To Predictable Location
-      run: cp coverage/**/coverage.cobertura.xml coverage.cobertura.xml
-
-    - name: Code Coverage Summary Report
+    - name: Code Coverage Report
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: coverage.cobertura.xml
+        filename: coverage/**/coverage.cobertura.xml
         badge: true
         fail_below_min: true
         format: markdown
