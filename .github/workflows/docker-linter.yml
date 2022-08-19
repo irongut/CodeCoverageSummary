@@ -45,7 +45,7 @@ jobs:
           no-fail: true
 
       - name: Upload Results
-        uses: github/codeql-action/upload-sarif@bec8c2936a0da74f16c19cedb1e9efb2b53a7e7b
+        uses: github/codeql-action/upload-sarif@2ca79b6fa8d3ec278944088b4aa5f46912db5d63
         with:
           sarif_file: hadolint-results.sarif
           wait-for-processing: true
