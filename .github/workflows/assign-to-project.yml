@@ -27,28 +27,28 @@ jobs:
           api.github.com:443
 
     - name: Assign Issues to Bugs
-      uses: srggrs/assign-one-project-github-action@4d59cc619499b55ca689fb13cfcc72324a8b8435
+      uses: srggrs/assign-one-project-github-action@65a8ddab497df42ef268001e67bbf976f8fd39e1
       if: contains(github.event.issue.labels.*.name, 'bug')
       with:
         project: 'https://github.com/irongut/CodeCoverageSummary/projects/1'
         column_name: 'Needs triage'
 
     - name: Assign Issues to Enhancements
-      uses: srggrs/assign-one-project-github-action@4d59cc619499b55ca689fb13cfcc72324a8b8435
+      uses: srggrs/assign-one-project-github-action@65a8ddab497df42ef268001e67bbf976f8fd39e1
       if: contains(github.event.issue.labels.*.name, 'enhancement')
       with:
         project: 'https://github.com/irongut/CodeCoverageSummary/projects/2'
         column_name: 'To do'
 
     - name: Assign PRs to Bugs
-      uses: srggrs/assign-one-project-github-action@4d59cc619499b55ca689fb13cfcc72324a8b8435
+      uses: srggrs/assign-one-project-github-action@65a8ddab497df42ef268001e67bbf976f8fd39e1
       if: contains(github.event.pull_request.labels.*.name, 'bug')
       with:
         project: 'https://github.com/irongut/CodeCoverageSummary/projects/1'
         column_name: 'In Progress'
 
     - name: Assign PRs to Enhancements
-      uses: srggrs/assign-one-project-github-action@4d59cc619499b55ca689fb13cfcc72324a8b8435
+      uses: srggrs/assign-one-project-github-action@65a8ddab497df42ef268001e67bbf976f8fd39e1
       if: contains(github.event.pull_request.labels.*.name, 'enhancement')
       with:
         project: 'https://github.com/irongut/CodeCoverageSummary/projects/2'
