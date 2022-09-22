@@ -53,7 +53,7 @@ jobs:
       uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@b398f525a5587552e573b247ac661067fafa920b
+      uses: github/codeql-action/init@86f3159a697a097a813ad9bfa0002412d97690a4
       with:
         languages: ${{ matrix.language }}
         # queries: security-extended,security-and-quality # https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
@@ -70,4 +70,4 @@ jobs:
       run: dotnet build src/CodeCoverageSummary.sln --configuration Release --no-restore /p:UseSharedCompilation=false
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@b398f525a5587552e573b247ac661067fafa920b
+      uses: github/codeql-action/analyze@86f3159a697a097a813ad9bfa0002412d97690a4
