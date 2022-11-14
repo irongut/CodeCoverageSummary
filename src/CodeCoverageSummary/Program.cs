@@ -53,8 +53,8 @@ namespace CodeCoverageSummary
                                          if (summary == null)
                                              return -2; // error
 
-                                         summary.LineRate /= matchingFiles.Count();
-                                         summary.BranchRate /= matchingFiles.Count();
+                                         summary.LineRate = summary.LinesCovered / summary.LinesValid;
+                                         summary.BranchRate = summary.BranchesCovered / summary.BranchesValid;
 
                                          if (summary.Packages.Count == 0)
                                          {
