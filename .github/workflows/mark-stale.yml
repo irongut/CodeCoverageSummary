@@ -24,7 +24,7 @@ jobs:
           api.github.com:443
 
     - name: Mark Stale
-      uses: actions/stale@9c1b1c6e115ca2af09755448e0dbba24e5061cc8
+      uses: actions/stale@1160a2240286f5da8ec72b1c0816ce2481aabf84
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         exempt-all-milestones: true
