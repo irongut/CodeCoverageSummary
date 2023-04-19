@@ -193,14 +193,19 @@ namespace CodeCoverageSummary
                     var branchesCovered = from item in coverage.Attributes()
                                           where item.Name == "branches-covered"
                                           select item;
-
-                    summary.BranchesCovered += int.TryParse(branchesCovered?.First().Value ?? "0", out int bCovered) ? bCovered : 0;
+                    if (branchesCovered.Any())
+                    {
+                        summary.BranchesCovered += int.TryParse(branchesCovered?.First().Value ?? "0", out int bCovered) ? bCovered : 0;
+                    }
 
                     var branchesValid = from item in coverage.Attributes()
                                         where item.Name == "branches-valid"
                                         select item;
 
-                    summary.BranchesValid += int.TryParse(branchesValid?.First().Value ?? "0", out int bValid) ? bValid : 0;
+                    if (branchesValid.Any())
+                    {
+                        summary.BranchesValid += int.TryParse(branchesValid?.First().Value ?? "0", out int bValid) ? bValid : 0;
+                    }
                 }
 
                 // test coverage for individual packages
