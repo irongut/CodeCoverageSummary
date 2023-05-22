@@ -30,7 +30,10 @@ namespace CodeCoverageSummary
         [Option(longName: "hidecomplexity", Required = false, HelpText = "Hide Complexity values in the output - true or false.", Default = "false")]
         public string HideComplexityString { get; set; }
 
-        public bool HideComplexity => HideComplexityString.Equals("true", StringComparison.OrdinalIgnoreCase);
+        [Option(longName: "hidedetail", Required = false, HelpText = "Hide Report detail in the output - true or false.", Default = "false")]
+        public string HideDetailString { get; set; }
+
+        public bool HideDetail => HideDetailString.Equals("true", StringComparison.OrdinalIgnoreCase);
 
         [Option(longName: "indicators", Required = false, HelpText = "Include health indicators in the output - true or false.", Default = "true")]
         public string IndicatorsString { get; set; }
