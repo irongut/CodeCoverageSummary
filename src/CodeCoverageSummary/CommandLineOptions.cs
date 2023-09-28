@@ -17,6 +17,9 @@ namespace CodeCoverageSummary
         [Option(longName: "fail", Required = false, HelpText = "Fail if overall Line Rate below lower threshold - true or false.", Default = "false")]
         public string FailString { get; set; }
 
+        [Option(longName: "continue_on_empty_test", Required = false, HelpText = "COntinue and do not throw error if empty coverage test encountered", Default = "false")]
+        public string continue_on_empty_testString { get; set; }
+
         public bool FailBelowThreshold => FailString.Equals("true", StringComparison.OrdinalIgnoreCase);
 
         [Option(longName: "format", Required = false, HelpText = "Output Format - markdown or text.", Default = "text")]

@@ -48,6 +48,9 @@ See [`thresholds`](#thresholds) to change these values.
 
 Fail the workflow if the overall Line Rate is below lower threshold - `true` or `false` (default). The default lower threshold is 50%, see [`thresholds`](#thresholds).
 
+### `continue_on_empty_test`
+
+When jest is run an no tests are detected, the coverage report generated has no packages. Default behaviour is to throw an error when this occurs. This flag can be set to `true` to continue if no tests are detected in the coverage reports
 
 ### `format`
 
@@ -109,13 +112,13 @@ Minimum allowed line rate is 50%
 ### Markdown Example
 
 > ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-83%25-success?style=flat)
-> 
+>
 > Package | Line Rate | Branch Rate | Complexity | Health
 > -------- | --------- | ----------- | ---------- | ------
 > Company.Example | 83% | 69% | 671 | ✔
 > Company.Example.Library | 27% | 100% | 11 | ❌
 > **Summary** | **83%** (1212 / 1460) | **69%** (262 / 378) | 682 | ✔
-> 
+>
 > _Minimum allowed line rate is `50%`_
 
 
@@ -168,6 +171,7 @@ jobs:
         filename: coverage/**/coverage.cobertura.xml
         badge: true
         fail_below_min: true
+        continue_on_empty_test: false
         format: markdown
         hide_branch_rate: false
         hide_complexity: true

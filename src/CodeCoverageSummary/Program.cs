@@ -208,7 +208,24 @@ namespace CodeCoverageSummary
                                select item;
 
                 if (!packages.Any())
-                    throw new Exception("No package data found");
+                {
+                    if (!continue_on_empty_test)
+                        throw new Exception("No package data found");
+
+
+                    CodeCoverage packageCoverage = new()
+                    {
+                        Name = $"{Path.GetFileNameWithoutExtension(filename)}",
+                        LineRate = 0,
+                        BranchRate = 0,
+                        Complexity = 0
+                    };
+                    summary.Packages.Add(packageCoverage);
+                    summary.Complexity += packageCoverage.Complexity;
+
+                    return summary;
+                }
+
 
                 int i = 1;
                 foreach (var item in packages)
@@ -352,7 +369,7 @@ namespace CodeCoverageSummary
             {
                 markdownOutput.Append($"{package.Name} | {package.LineRate * 100:N0}%")
                               .Append(hideBranchRate ? string.Empty : $" | {package.BranchRate * 100:N0}%")
-                              .Append(hideComplexity ? string.Empty : (package.Complexity % 1 == 0) ? $" | {package.Complexity}" : $" | {package.Complexity:N4}" )
+                              .Append(hideComplexity ? string.Empty : (package.Complexity % 1 == 0) ? $" | {package.Complexity}" : $" | {package.Complexity:N4}")
                               .AppendLine(indicators ? $" | {GenerateHealthIndicator(package.LineRate)}" : string.Empty);
             }
 
