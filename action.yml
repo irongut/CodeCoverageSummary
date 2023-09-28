@@ -54,6 +54,8 @@ runs:
     - ${{ inputs.badge }}
     - '--fail'
     - ${{ inputs.fail_below_min }}
+    - '--continue_on_empty_test'
+    - ${{ inputs.continue_on_empty_test }}
     - '--format'
     - ${{ inputs.format }}
     - '--hidebranch'
