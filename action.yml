@@ -16,6 +16,10 @@ inputs:
     description: 'Fail if overall Line Rate below lower threshold - true / false (default).'
     required: false
     default: 'false'
+  continue_on_empty_test:
+    description: 'Continue if no packages are detected on input coverage reports'
+    required: false
+    default: 'false'
   format:
     description: 'Output Format - markdown or text (default).'
     required: false
