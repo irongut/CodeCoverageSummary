@@ -37,7 +37,7 @@ namespace CodeCoverageSummary
 
         public bool Indicators => IndicatorsString.Equals("true", StringComparison.OrdinalIgnoreCase);
 
-        [Option(longName: "output", Required = false, HelpText = "Output Type - console, file or both.", Default = "console")]
+        [Option(longName: "output", Required = false, HelpText = "Output Type - console, file or both. Also supports github output", Default = "console")]
         public string Output { get; set; }
 
         [Option(longName: "thresholds", Required = false, HelpText = "Threshold percentages for badge and health indicators, lower threshold can also be used to fail the action.", Default = "50 75")]

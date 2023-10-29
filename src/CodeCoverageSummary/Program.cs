@@ -114,6 +114,24 @@ namespace CodeCoverageSummary
                                                  Console.WriteLine(output);
                                                  File.WriteAllText($"code-coverage-results.{fileExt}", output);
                                              }
+                                             else if (o.Output.Equals("github", StringComparison.OrdinalIgnoreCase))
+                                             {
+                                                 var envFile = Environment.GetEnvironmentVariable("GITHUB_OUTPUT");
+                                                if (string.IsNullOrWhiteSpace(envFile))
+                                                {
+                                                    Console.WriteLine("Error: GITHUB_OUTPUT environment variable not set.");
+                                                    return -2; // error
+                                                }
+
+                                                using var writer = new StreamWriter(envFile, append: true, Encoding.UTF8);
+
+                                                writer.WriteLine("badge=" + badgeUrl);
+                                                writer.WriteLine("line_rate=" + (summary.LineRate * 100).ToString("0.00"));
+                                                writer.WriteLine("branch_rate=" + (summary.BranchRate * 100).ToString("0.00"));
+                                                writer.WriteLine("complexity=" + summary.Complexity.ToString("0.00"));
+                                                writer.WriteLine("health=" + GenerateHealthIndicator(summary.LineRate));
+                                                writer.Flush();
+                                             }
                                              else
                                              {
                                                  Console.WriteLine("Error: Unknown output type.");

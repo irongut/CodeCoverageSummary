@@ -33,7 +33,7 @@ inputs:
     required: false
     default: 'true'
   output:
-    description: 'Output Type - console (default), file or both.'
+    description: 'Output Type - console (default), file or both. Also supports github output.'
     required: false
     default: 'console'
   thresholds:
