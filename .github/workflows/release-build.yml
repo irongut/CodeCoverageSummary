@@ -104,7 +104,7 @@ jobs:
 
       - name: Build + Push Docker image
         id: build-and-push
-        uses: docker/build-push-action@c56af957549030174b10d6867f20e78cfd7debc5
+        uses: docker/build-push-action@4f58ea79222b3b9dc2c8bbdd6debcef730109a75
         with:
           context: .
           push: true
