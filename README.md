@@ -93,6 +93,11 @@ Output Type - `console` (default), `file` or `both`.
 Lower and upper threshold percentages for badge and health indicators, lower threshold can also be used to fail the action. Separate the values with a space and enclose them in quotes; default `'50 75'`.
 
 
+### `collapsible`
+
+Wrap the markdown table in collapsible `<details></details>` tags - `true` or `false` (default).
+
+
 ## Outputs
 
 ### Text Example
@@ -115,6 +120,23 @@ Minimum allowed line rate is 50%
 > Company.Example | 83% | 69% | 671 | ✔
 > Company.Example.Library | 27% | 100% | 11 | ❌
 > **Summary** | **83%** (1212 / 1460) | **69%** (262 / 378) | 682 | ✔
+> 
+> _Minimum allowed line rate is `50%`_
+
+### Collapsible Markdown Example
+
+> ![Code Coverage](https://img.shields.io/badge/Code%20Coverage-83%25-success?style=flat)
+> 
+> <details>
+> <summary>Code Coverage Summary</summary>
+> 
+> Package | Line Rate | Branch Rate | Complexity | Health
+> -------- | --------- | ----------- | ---------- | ------
+> Company.Example | 83% | 69% | 671 | ✔
+> Company.Example.Library | 27% | 100% | 11 | ❌
+> **Summary** | **83%** (1212 / 1460) | **69%** (262 / 378) | 682 | ✔
+> 
+> </details>
 > 
 > _Minimum allowed line rate is `50%`_
 
@@ -174,6 +196,7 @@ jobs:
         indicators: true
         output: both
         thresholds: '60 80'
+        collapsible: true
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2

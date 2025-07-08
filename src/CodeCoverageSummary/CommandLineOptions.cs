@@ -42,5 +42,10 @@ namespace CodeCoverageSummary
 
         [Option(longName: "thresholds", Required = false, HelpText = "Threshold percentages for badge and health indicators, lower threshold can also be used to fail the action.", Default = "50 75")]
         public string Thresholds { get; set; }
+
+        [Option(longName: "collapsible", Required = false, HelpText = "Wrap the markdown table in collapsible details tags - true or false.", Default = "false")]
+        public string CollapsibleString { get; set; }
+
+        public bool Collapsible => CollapsibleString.Equals("true", StringComparison.OrdinalIgnoreCase);
     }
 }
