@@ -42,19 +42,18 @@ namespace CodeCoverageSummary
                                              }
                                          }
 
-                                         // parse code coverage file
-                                         CodeSummary summary = new();
+                                         // parse code coverage files, merging coverage for
+                                         // packages/classes that appear in more than one file
+                                         // (e.g. separate unit test and functional test coverage runs)
+                                         Dictionary<string, PackageMerge> merge = new();
                                          foreach (var file in matchingFiles)
                                          {
                                              Console.WriteLine($"Coverage File: {file}");
-                                             summary = ParseTestResults(file, summary);
+                                             if (!ParseTestResults(file, merge))
+                                                 return -2; // error
                                          }
 
-                                         if (summary == null)
-                                             return -2; // error
-
-                                         summary.LineRate /= matchingFiles.Count();
-                                         summary.BranchRate /= matchingFiles.Count();
+                                         CodeSummary summary = BuildSummary(merge);
 
                                          if (summary.Packages.Count == 0)
                                          {
@@ -138,100 +137,175 @@ namespace CodeCoverageSummary
                                  _ => -1); // invalid arguments
         }
 
-        private static CodeSummary ParseTestResults(string filename, CodeSummary summary)
+        // per-line coverage, keyed by line number, merged across coverage files
+        private sealed class LineMerge
         {
-            if (summary == null)
-                return null;
+            public bool Covered { get; set; }
 
+            public int BranchesCovered { get; set; }
+
+            public int BranchesValid { get; set; }
+        }
+
+        private sealed class ClassMerge
+        {
+            public double Complexity { get; set; }
+
+            public Dictionary<int, LineMerge> Lines { get; } = new();
+        }
+
+        private sealed class PackageMerge
+        {
+            public Dictionary<string, ClassMerge> Classes { get; } = new();
+        }
+
+        private static bool ParseTestResults(string filename, Dictionary<string, PackageMerge> merge)
+        {
             try
             {
                 string rss = File.ReadAllText(filename);
                 var xdoc = XDocument.Parse(rss);
 
                 // test coverage for solution
-                var coverage = from item in xdoc.Descendants("coverage")
-                               select item;
+                var coverage = xdoc.Descendants("coverage");
 
                 if (!coverage.Any())
                     throw new Exception("Coverage file invalid, data not found");
 
-                var lineR = from item in coverage.Attributes()
-                            where item.Name == "line-rate"
-                            select item;
-
-                if (!lineR.Any())
-                    throw new Exception("Overall line rate not found");
-
-                summary.LineRate += double.Parse(lineR.First().Value);
-
-                var linesCovered = from item in coverage.Attributes()
-                                   where item.Name == "lines-covered"
-                                   select item;
-
-                if (!linesCovered.Any())
-                    throw new Exception("Overall lines covered not found");
-
-                summary.LinesCovered += int.Parse(linesCovered.First().Value);
-
-                var linesValid = from item in coverage.Attributes()
-                                 where item.Name == "lines-valid"
-                                 select item;
-
-                if (!linesValid.Any())
-                    throw new Exception("Overall lines valid not found");
-
-                summary.LinesValid += int.Parse(linesValid.First().Value);
-
-                var branchR = from item in coverage.Attributes()
-                              where item.Name == "branch-rate"
-                              select item;
-
-                if (branchR.Any())
-                {
-                    summary.BranchRate += double.TryParse(branchR.First().Value, out double bRate) ? bRate : 0;
-
-                    var branchesCovered = from item in coverage.Attributes()
-                                          where item.Name == "branches-covered"
-                                          select item;
-
-                    summary.BranchesCovered += int.TryParse(branchesCovered?.First().Value ?? "0", out int bCovered) ? bCovered : 0;
-
-                    var branchesValid = from item in coverage.Attributes()
-                                        where item.Name == "branches-valid"
-                                        select item;
-
-                    summary.BranchesValid += int.TryParse(branchesValid?.First().Value ?? "0", out int bValid) ? bValid : 0;
-                }
-
                 // test coverage for individual packages
-                var packages = from item in coverage.Descendants("package")
-                               select item;
+                var packages = coverage.Descendants("package");
 
                 if (!packages.Any())
                     throw new Exception("No package data found");
 
-                int i = 1;
-                foreach (var item in packages)
+                int packageIndex = 1;
+                foreach (var packageElement in packages)
                 {
-                    CodeCoverage packageCoverage = new()
+                    string packageName = string.IsNullOrWhiteSpace(packageElement.Attribute("name")?.Value)
+                        ? $"{Path.GetFileNameWithoutExtension(filename)} Package {packageIndex}"
+                        : packageElement.Attribute("name").Value;
+
+                    if (!merge.TryGetValue(packageName, out PackageMerge packageMerge))
                     {
-                        Name = string.IsNullOrWhiteSpace(item.Attribute("name")?.Value) ? $"{Path.GetFileNameWithoutExtension(filename)} Package {i}" : item.Attribute("name").Value,
-                        LineRate = double.Parse(item.Attribute("line-rate")?.Value ?? "0"),
-                        BranchRate = double.TryParse(item.Attribute("branch-rate")?.Value ?? "0", out double bRate) ? bRate : 0,
-                        Complexity = double.TryParse(item.Attribute("complexity")?.Value ?? "0", out double complex) ? complex : 0
-                    };
-                    summary.Packages.Add(packageCoverage);
-                    summary.Complexity += packageCoverage.Complexity;
-                    i++;
+                        packageMerge = new PackageMerge();
+                        merge[packageName] = packageMerge;
+                    }
+
+                    var classes = packageElement.Descendants("class");
+
+                    if (!classes.Any())
+                        throw new Exception("No class data found");
+
+                    int classIndex = 1;
+                    foreach (var classElement in classes)
+                    {
+                        string className = string.IsNullOrWhiteSpace(classElement.Attribute("name")?.Value)
+                            ? $"{Path.GetFileNameWithoutExtension(filename)} Class {classIndex}"
+                            : classElement.Attribute("name").Value;
+
+                        if (!packageMerge.Classes.TryGetValue(className, out ClassMerge classMerge))
+                        {
+                            classMerge = new ClassMerge();
+                            packageMerge.Classes[className] = classMerge;
+                        }
+
+                        classMerge.Complexity = Math.Max(classMerge.Complexity,
+                            double.TryParse(classElement.Attribute("complexity")?.Value ?? "0", out double complex) ? complex : 0);
+
+                        foreach (var lineElement in classElement.Element("lines")?.Elements("line") ?? Enumerable.Empty<XElement>())
+                        {
+                            if (!int.TryParse(lineElement.Attribute("number")?.Value, out int lineNumber))
+                                continue;
+
+                            int hits = int.TryParse(lineElement.Attribute("hits")?.Value, out int h) ? h : 0;
+                            (int branchesCovered, int branchesValid) = ParseConditionCoverage(lineElement.Attribute("condition-coverage")?.Value);
+
+                            if (!classMerge.Lines.TryGetValue(lineNumber, out LineMerge lineMerge))
+                            {
+                                lineMerge = new LineMerge();
+                                classMerge.Lines[lineNumber] = lineMerge;
+                            }
+
+                            lineMerge.Covered = lineMerge.Covered || hits > 0;
+                            lineMerge.BranchesValid = Math.Max(lineMerge.BranchesValid, branchesValid);
+                            lineMerge.BranchesCovered = Math.Max(lineMerge.BranchesCovered, branchesCovered);
+                        }
+
+                        classIndex++;
+                    }
+
+                    packageIndex++;
                 }
 
-                return summary;
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Parsing Error: {ex.Message} - {filename}");
-                return null;
+                return false;
             }
+        }
+
+        private static (int covered, int valid) ParseConditionCoverage(string conditionCoverage)
+        {
+            // format: "50% (1/2)"
+            if (string.IsNullOrWhiteSpace(conditionCoverage))
+                return (0, 0);
+
+            int open = conditionCoverage.IndexOf('(');
+            int slash = conditionCoverage.IndexOf('/');
+            int close = conditionCoverage.IndexOf(')');
+
+            if (open < 0 || slash < 0 || close < 0 || slash < open || close < slash)
+                return (0, 0);
+
+            bool coveredOk = int.TryParse(conditionCoverage.AsSpan(open + 1, slash - open - 1), out int covered);
+            bool validOk = int.TryParse(conditionCoverage.AsSpan(slash + 1, close - slash - 1), out int valid);
+
+            return coveredOk && validOk ? (covered, valid) : (0, 0);
+        }
+
+        private static CodeSummary BuildSummary(Dictionary<string, PackageMerge> merge)
+        {
+            CodeSummary summary = new();
+
+            foreach (var (packageName, packageMerge) in merge)
+            {
+                int packageLinesCovered = 0, packageLinesValid = 0;
+                int packageBranchesCovered = 0, packageBranchesValid = 0;
+                double packageComplexity = 0;
+
+                foreach (var classMerge in packageMerge.Classes.Values)
+                {
+                    packageLinesValid += classMerge.Lines.Count;
+                    packageLinesCovered += classMerge.Lines.Values.Count(l => l.Covered);
+                    packageBranchesValid += classMerge.Lines.Values.Sum(l => l.BranchesValid);
+                    packageBranchesCovered += classMerge.Lines.Values.Sum(l => l.BranchesCovered);
+                    packageComplexity += classMerge.Complexity;
+                }
+
+                double packageLineRate = packageLinesValid == 0 ? 0 : (double)packageLinesCovered / packageLinesValid;
+                double packageBranchRate = packageBranchesValid == 0 ? 0 : (double)packageBranchesCovered / packageBranchesValid;
+
+                summary.Packages.Add(new CodeCoverage
+                {
+                    Name = packageName,
+                    LineRate = packageLineRate,
+                    BranchRate = packageBranchRate,
+                    Complexity = packageComplexity
+                });
+
+                summary.LinesCovered += packageLinesCovered;
+                summary.LinesValid += packageLinesValid;
+                summary.BranchesCovered += packageBranchesCovered;
+                summary.BranchesValid += packageBranchesValid;
+                summary.Complexity += packageComplexity;
+            }
+
+            summary.LineRate = summary.LinesValid == 0 ? 0 : (double)summary.LinesCovered / summary.LinesValid;
+            summary.BranchRate = summary.BranchesValid == 0 ? 0 : (double)summary.BranchesCovered / summary.BranchesValid;
+
+            return summary;
         }
 
         private static void SetThresholds(string thresholds)
